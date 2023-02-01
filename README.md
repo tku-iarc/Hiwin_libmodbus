@@ -1,35 +1,35 @@
-# Modbus_Hiwin
+## Modbus Library for Hiwin Robot
 
-Installation
+### Getting start
 
-舉例以 Ubuntu 或 Debian 來說，作業系統的套件資料庫已經包含了 libmodbus 的套件，只需要輸入以下指令即可完成安裝：
+#### Clone this Repository
+```
+cd <your_workspace>/src
+git clone --recurse-submodules https://github.com/tku-iarc/Hiwin_libmodbus.git
+```
 
-安裝
-`$ sudo apt-get install libmodbus5 libmodbus-dev`
+#### Install Libmodbus
+```
+# build and install libmodbus to /usr/local/lib
+cd Hiwin_libmodbus/libmodbus
+./autogen.sh
+./configure
+sudo make install
+# end
 
-如需安裝最新版(請查閱)  [https://libmodbus.org/releases/](https://libmodbus.org/releases/)
-`libmodbus-3.0.5`->更換成新版本
+# write the export into bashrc so that every time you open a new terminal, it will automatically export
+echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib" >> ~/.bashrc
+```
 
-`$ wget http://libmodbus.org/site_media/build/libmodbus-3.1.7.tar.gz`
+#### Build
+```
+cd <your_workspace>
+colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
+```
 
-`$ sudo chmod 755 libmodbus-3.1.7.tar.gz`
- 
-`$ tar zxvf libmodbus-3.1.7.tar.gz -C .`
-
-`$ cd libmodbus-3.1.7/`
-
-`$ ./configure`
-
-`$ make`
-
-`$ sudo make install`
-
-於此即完成安裝。
-
-編譯程式 `cc -o Hiwin_API Hiwin_API.c -lmodbus -I./`
-
-生成so檔 `cc -fPIC -shared -o Hiwin_API.so Hiwin_API.c -lmodbus -I./`
-
-`gcc -shared -Wl,-soname,Hiwin_API-o Hiwin_API.so -fPIC Hiwin_API.c`
-
-執行 `python3 Hiwin_API_test.py`
+#### Run the Test Script
+```
+cd <your_workspace>
+source install/setup.bash
+ros2 run hiwin_libmodbus Hiwin_API_test.py
+```
