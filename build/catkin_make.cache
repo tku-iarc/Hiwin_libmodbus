@@ -1,2 +1,0 @@
-libmodbus_ROS
--DCATKIN_DEVEL_PREFIX=/home/iclab/modbus_ws/devel -DCMAKE_INSTALL_PREFIX=/home/iclab/modbus_ws/install -G Unix Makefiles

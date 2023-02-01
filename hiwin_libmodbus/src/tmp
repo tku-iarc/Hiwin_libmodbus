@@ -1,0 +1,71 @@
+#include <iostream>
+
+#include "hiwin_libmodbus/hiwin_libmodbus.hpp"
+
+extern "C" {
+
+uintptr_t HiwinLibmodbusConstructor()
+{
+  HiwinLibmodbus* ptr = new HiwinLibmodbus();
+  std::cout<<ptr<<std::endl;
+  std::cout<<uintptr_t(ptr)<<std::endl;
+  HiwinLibmodbus* ptr2 = (HiwinLibmodbus*)(uintptr_t(ptr));
+  std::cout<<ptr2<<std::endl;
+  return uintptr_t(ptr);
+}
+
+void HiwinLibmodbusDestructor(uintptr_t ptr_int)
+{
+  delete ((HiwinLibmodbus*)ptr_int);
+}
+
+void Holding_Registers_init(uintptr_t ptr_int){
+  ptr->Holding_Registers_init();
+}
+
+int libModbus_Connect(HiwinLibmodbus* ptr_int){
+  return ptr->libModbus_Connect();
+}
+
+void Modbus_Close(HiwinLibmodbus* ptr_int){ 
+  ptr->Modbus_Close();
+}
+
+int Arm_State_REGISTERS(HiwinLibmodbus* ptr_int){
+  return ptr->Arm_State_REGISTERS();
+}
+
+int Read_REGISTERS(HiwinLibmodbus* ptr_int, int addr){
+  return ptr->Read_REGISTERS(addr);
+}
+void DO(HiwinLibmodbus* ptr_int, int DO_Num, int x){
+  ptr->DO(DO_Num, x);
+}
+
+void HOME(HiwinLibmodbus* ptr_int){  
+  ptr->HOME();
+}
+
+void PTP(HiwinLibmodbus* ptr_int, 
+  int type, int vel, int acc, int TOOL, int BASE, double *Angle)
+{
+  ptr->PTP(type, vel, acc, TOOL, BASE, Angle);
+}
+
+void LIN(HiwinLibmodbus* ptr_int, 
+  int type, int vel, int acc, int TOOL, int BASE, double *XYZ)
+{
+  ptr->LIN(type, vel, acc, TOOL, BASE, XYZ);
+}
+
+void CIRC(HiwinLibmodbus* ptr_int, 
+  int vel, int acc, int TOOL, int BASE, double *CIRC_s, double *CIRC_end)
+{
+  ptr->CIRC(vel, acc, TOOL, BASE, CIRC_s, CIRC_end);
+}
+
+void JOG(HiwinLibmodbus* ptr_int, int joint, int dir){
+  ptr->JOG(joint, dir);
+}
+
+} // end of extern "C"

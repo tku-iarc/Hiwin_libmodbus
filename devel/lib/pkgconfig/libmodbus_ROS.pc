@@ -1,8 +1,0 @@
-prefix=/home/iclab/modbus_ws/devel
-
-Name: libmodbus_ROS
-Description: Description of libmodbus_ROS
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

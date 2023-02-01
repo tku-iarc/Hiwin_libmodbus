@@ -1,2 +1,0 @@
-
--DCATKIN_DEVEL_PREFIX=/home/iclab/libmodbus/devel -DCMAKE_INSTALL_PREFIX=/home/iclab/libmodbus/install -G Unix Makefiles
