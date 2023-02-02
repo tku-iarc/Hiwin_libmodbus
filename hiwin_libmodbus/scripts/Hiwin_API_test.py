@@ -25,7 +25,7 @@ from hiwin_libmodbus import HiwinLibmodbus
 if __name__ == "__main__":
 
     hiwin_libmodbus = HiwinLibmodbus()
-
+    ARM_IP = '192.168.0.1'
     Arm_state = 0
     PTP_Angle = [0, 0, 0, 0, -90, 0]                 # ANGLE
     PTP_XYZ   = [204.049, 368, 293.5, 180, 0, 90]    # XYZABC
@@ -46,24 +46,26 @@ if __name__ == "__main__":
     # modbus.CIRC.argtypes = [c_int, c_int, c_int, c_int]
 
     # while 1:
-    hiwin_libmodbus.libModbus_Connect()
-    hiwin_libmodbus.Holding_Registers_init()
+    if hiwin_libmodbus.libModbus_Connect(ARM_IP):
+        hiwin_libmodbus.Holding_Registers_init()
 
-    # modbus.PTP(0, 10, 10, 1, 0, C_PTP_Angle)
-    # modbus.CIRC(10, 10, 1, 0, C_CIRC_centre, C_CIRC_end)
+        # modbus.PTP(0, 10, 10, 1, 0, C_PTP_Angle)
+        # modbus.CIRC(10, 10, 1, 0, C_CIRC_centre, C_CIRC_end)
 
-    # modbus.DO(IO_Port,0) # 1 -> on ; 0 -> off
-    while 1:
-        # rospy.init_node('libmodbus_ROS')
-
-        # modbus.Holding_Registers_init()
-        # modbus.HOME() # 1 RUN
-        # modbus.PTP(0, 200, 10, 1, 0, C_PTP_Angle)
         # modbus.DO(IO_Port,0) # 1 -> on ; 0 -> off
-        if(hiwin_libmodbus.Arm_State_REGISTERS() == 1):
-            break
+        while 1:
+            # rospy.init_node('libmodbus_ROS')
 
-    hiwin_libmodbus.Modbus_Close()
+            # modbus.Holding_Registers_init()
+            # modbus.HOME() # 1 RUN
+            # modbus.PTP(0, 200, 10, 1, 0, C_PTP_Angle)
+            # modbus.DO(IO_Port,0) # 1 -> on ; 0 -> off
+            if(hiwin_libmodbus.Arm_State_REGISTERS() == 1):
+                break
+
+        hiwin_libmodbus.Modbus_Close()
+    else:
+        print("Modbus connect failed")  
     print("Modbus Close")  
 
     

@@ -1,4 +1,4 @@
-from ctypes import CDLL, c_double, c_int, c_void_p, c_void_p
+from ctypes import CDLL, c_double, c_int, c_void_p, c_void_p, c_wchar_p
 from ament_index_python.packages import get_package_prefix
 
 class HiwinLibmodbus(object):
@@ -9,7 +9,7 @@ class HiwinLibmodbus(object):
     
     self.hiwin_lib.HiwinLibmodbusDestructor.argtypes = [c_void_p]
     self.hiwin_lib.Holding_Registers_init.argtypes = [c_void_p]
-    self.hiwin_lib.libModbus_Connect.argtypes = [c_void_p]
+    self.hiwin_lib.libModbus_Connect.argtypes = [c_void_p, c_wchar_p]
     self.hiwin_lib.Modbus_Close.argtypes = [c_void_p]
     self.hiwin_lib.Arm_State_REGISTERS.argtypes = [c_void_p]
     self.hiwin_lib.Read_REGISTERS.argtypes = [c_void_p, c_int]
@@ -29,8 +29,8 @@ class HiwinLibmodbus(object):
     self.hiwin_lib.Holding_Registers_init(self.hiwin_libmodbus_ptr)
     return
 
-  def libModbus_Connect(self):
-    return self.hiwin_lib.libModbus_Connect(self.hiwin_libmodbus_ptr)
+  def libModbus_Connect(self, ip_address='192.168.0.1'):
+    return self.hiwin_lib.libModbus_Connect(self.hiwin_libmodbus_ptr, ip_address)
 
   def Modbus_Close(self):
     self.hiwin_lib.Modbus_Close(self.hiwin_libmodbus_ptr)

@@ -18,8 +18,8 @@ void Holding_Registers_init(HiwinLibmodbus* ptr){
   ptr->Holding_Registers_init();
 }
 
-int libModbus_Connect(HiwinLibmodbus* ptr){
-  return ptr->libModbus_Connect();
+int libModbus_Connect(HiwinLibmodbus* ptr, const wchar_t * ip_address){
+  return ptr->libModbus_Connect(ip_address);
 }
 
 void Modbus_Close(HiwinLibmodbus* ptr){ 

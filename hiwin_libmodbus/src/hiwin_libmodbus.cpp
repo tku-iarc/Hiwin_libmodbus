@@ -1,3 +1,4 @@
+#include <iostream>
 #include "hiwin_libmodbus/hiwin_libmodbus.hpp"
 
 // namespace hiwin_libmodbus
@@ -18,9 +19,19 @@ void HiwinLibmodbus::Holding_Registers_init(){
   wrt_ = modbus_write_register(ctx_, 200, 0);
 }
 
-int HiwinLibmodbus::libModbus_Connect(){
+int HiwinLibmodbus::libModbus_Connect(const std::string& ip_address){
+  return libModbus_Connect(ip_address.c_str());
+}
+
+int HiwinLibmodbus::libModbus_Connect(const wchar_t * ip_address){
+  std::wstring ip_adr(ip_address);
+  std::cout<<std::string(ip_adr.begin(), ip_adr.end())<<std::endl;
+  return libModbus_Connect(std::string(ip_adr.begin(), ip_adr.end()).c_str());
+}
+
+int HiwinLibmodbus::libModbus_Connect(const char *ip_address){
   /***** set IP and Port *****/
-  ctx_ = modbus_new_tcp(MODBUS_SERVER_IP, MODBUS_SERVER_PORT);
+  ctx_ = modbus_new_tcp(ip_address, MODBUS_SERVER_PORT);
  
   /* Debug mode */
   modbus_set_debug(ctx_, TRUE);
@@ -37,8 +48,9 @@ int HiwinLibmodbus::libModbus_Connect(){
   if (modbus_connect(ctx_) == -1) {
     fprintf(stderr, "Connexion failed: %s\n", modbus_strerror(errno));
     modbus_free(ctx_);
-    return -1;
+    return 0;
   }
+  return 1;
 }
 
 void HiwinLibmodbus::Modbus_Close(){ 

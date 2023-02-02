@@ -9,6 +9,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <errno.h>
+#include <string>
  
 #include <modbus/modbus.h>
  
@@ -38,7 +39,11 @@ public:
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void Holding_Registers_init();
   HIWIN_LIBMODBUS_PUBLIC_TYPE
-  int libModbus_Connect();
+  int libModbus_Connect(const std::string& ip_address);
+  HIWIN_LIBMODBUS_PUBLIC_TYPE
+  int libModbus_Connect(const wchar_t *ip_address);
+  HIWIN_LIBMODBUS_PUBLIC_TYPE
+  int libModbus_Connect(const char *ip_address);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void Modbus_Close();
   HIWIN_LIBMODBUS_PUBLIC_TYPE
