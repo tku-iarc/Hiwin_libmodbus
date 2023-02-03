@@ -8,19 +8,6 @@ cd <your_workspace>/src
 git clone --recurse-submodules https://github.com/tku-iarc/Hiwin_libmodbus.git
 ```
 
-#### Install Libmodbus
-```
-# build and install libmodbus to /usr/local/lib
-cd Hiwin_libmodbus/libmodbus
-./autogen.sh
-./configure
-sudo make install
-# end
-
-# write the export into bashrc so that every time you open a new terminal, it will automatically export
-echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib" >> ~/.bashrc
-```
-
 #### Build
 ```
 cd <your_workspace>
