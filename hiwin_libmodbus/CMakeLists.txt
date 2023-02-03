@@ -5,6 +5,61 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+# Define path of libmodbus folder here.
+find_path(LIBMODBUS_PATH
+  NAMES "README.md"
+  HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../libmodbus/"
+)
+message("Libmodbus path dir = ${LIBMODBUS_PATH}")
+# Run autogen.sh if config.h.in does not exist.
+find_path(CONFIGURE_IN_PATH
+  NAMES "config.h.in"
+  HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../libmodbus/"
+)
+if(NOT CONFIGURE_IN_PATH)
+  execute_process(
+    COMMAND "${LIBMODBUS_PATH}/autogen.sh"
+    WORKING_DIRECTORY ${LIBMODBUS_PATH}
+    RESULT_VARIABLE AUTOGEN_RESULT
+    OUTPUT_VARIABLE AUTOGEN_OUTPUT
+    ERROR_VARIABLE AUTOGEN_ERROR
+  )
+  if(AUTOGEN_RESULT)
+    message("Libmodbus autogen RESULT = ${AUTOGEN_RESULT}")
+  endif()
+  if(AUTOGEN_OUTPUT)
+    message("Libmodbus autogen OUTPUT = ${AUTOGEN_OUTPUT}")
+  endif()
+  if(AUTOGEN_ERROR)
+    message("Libmodbus autogen ERROR = ${AUTOGEN_ERROR}")
+  endif()
+endif()
+
+# Run configure if config.h does not exist.
+find_path(CONFIGURE_H_PATH
+  NAMES "config.h"
+  HINTS "${CMAKE_CURRENT_SOURCE_DIR}/../libmodbus/"
+)
+if(NOT CONFIGURE_H_PATH)
+  execute_process(
+    COMMAND ${LIBMODBUS_PATH}/configure
+    WORKING_DIRECTORY ${LIBMODBUS_PATH}
+    RESULT_VARIABLE CONFIGURE_RESULT
+    OUTPUT_VARIABLE CONFIGURE_OUTPUT
+    ERROR_VARIABLE CONFIGURE_ERROR
+  )
+  if(CONFIGURE_RESULT)
+    message("Libmodbus configure RESULT = ${CONFIGURE_RESULT}")
+  endif()
+  if(CONFIGURE_OUTPUT)
+    message("Libmodbus configure OUTPUT = ${CONFIGURE_OUTPUT}")
+  endif()
+  if(CONFIGURE_ERROR)
+    message("Libmodbus configure ERROR = ${CONFIGURE_ERROR}")
+  endif()
+endif()
+
+
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
@@ -13,17 +68,25 @@ find_package(ament_cmake_ros REQUIRED)
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
+set(LIBMODBUS_CORE_FILES
+  ${LIBMODBUS_PATH}/src/modbus-data.c
+  ${LIBMODBUS_PATH}/src/modbus-rtu.c
+  ${LIBMODBUS_PATH}/src/modbus-tcp.c
+  ${LIBMODBUS_PATH}/src/modbus.c
+)
+
 add_library(${PROJECT_NAME} SHARED
-  src/hiwin_libmodbus.cpp)
+  src/hiwin_libmodbus.cpp
+  ${LIBMODBUS_CORE_FILES}
+)
+
 target_compile_features(${PROJECT_NAME} 
   PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${LIBMODBUS_PATH}/src>
+  $<BUILD_INTERFACE:${LIBMODBUS_PATH}>
   $<INSTALL_INTERFACE:include>)
-
-target_link_libraries(${PROJECT_NAME}
-  modbus
-)
 
 add_library(${PROJECT_NAME}_ctype_wrapper SHARED
   src/hiwin_libmodbus_ctype_wrapper.cpp)
@@ -35,7 +98,6 @@ target_include_directories(${PROJECT_NAME}_ctype_wrapper PUBLIC
 
 target_link_libraries(${PROJECT_NAME}_ctype_wrapper
   ${PROJECT_NAME}
-  modbus
 )
 
 # Causes the visibility macros to use dllexport rather than dllimport,

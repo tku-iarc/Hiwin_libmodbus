@@ -11,7 +11,7 @@
 #include <errno.h>
 #include <string>
  
-#include <modbus/modbus.h>
+#include <modbus.h>
  
 #define MODBUS_SERVER_IP       "192.168.0.1"
 #define MODBUS_SERVER_PORT     502
