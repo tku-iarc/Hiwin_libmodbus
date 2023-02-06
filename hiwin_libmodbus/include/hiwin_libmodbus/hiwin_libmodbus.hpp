@@ -60,6 +60,7 @@ public:
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void LIN(
     int type, int vel, int acc, int TOOL, int BASE, double *XYZ);
+  void MOTOR_EXCITE();
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void CIRC(
     int vel, int acc, int TOOL, int BASE, double *CIRC_s, double *CIRC_end);

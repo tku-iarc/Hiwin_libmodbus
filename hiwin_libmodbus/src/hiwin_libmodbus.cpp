@@ -196,6 +196,11 @@ void HiwinLibmodbus::LIN(int type, int vel, int acc, int TOOL, int BASE, double 
   wrt_ = modbus_write_register(ctx_, 200, 1);
 }
 
+void HiwinLibmodbus::MOTOR_EXCITE(){
+  
+  wrt_ = modbus_write_register(ctx_, 200, 0);
+}
+
 void HiwinLibmodbus::CIRC(int vel, int acc, int TOOL, int BASE, double *CIRC_s, double *CIRC_end){
   // TODO: the arguments should be defined, 
   // number can't be directly written here, people will confused what it is.

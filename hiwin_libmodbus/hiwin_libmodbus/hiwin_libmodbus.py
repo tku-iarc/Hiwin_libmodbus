@@ -47,7 +47,7 @@ class HiwinLibmodbus(object):
     return
 
   def HOME(self):
-    self.hiwin_lib.HOME(self.hiwin_libmodbus_ptre)
+    self.hiwin_lib.HOME(self.hiwin_libmodbus_ptr)
     return
 
   def PTP(self, type, vel, acc, TOOL, BASE, Angle):
@@ -59,6 +59,10 @@ class HiwinLibmodbus(object):
     xyz = self.list_to_double_array(XYZ)
     self.hiwin_lib.LIN(self.hiwin_libmodbus_ptr, type, vel, acc, TOOL, BASE, xyz)
     return
+
+  def MOTOR_EXCITE(self):
+    return
+
 
   def CIRC(self, vel, acc, TOOL, BASE, CIRC_s, CIRC_end):
     c_circ_s = self.list_to_double_array(CIRC_s)

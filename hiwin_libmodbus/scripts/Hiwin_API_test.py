@@ -4,7 +4,7 @@
 # from calendar import c
 # from operator import mod
 # import numpy as np
-# from ctypes import *
+from ctypes import *
 # import time
 # import rospy
 
@@ -21,13 +21,15 @@ from hiwin_libmodbus import HiwinLibmodbus
 # so_file = "./Hiwin_API.so"
 # modbus = CDLL(so_file)
 
-
 if __name__ == "__main__":
+    print("xxxxxxxxxxxxxxxxxxxxx")
 
     hiwin_libmodbus = HiwinLibmodbus()
     ARM_IP = '192.168.0.1'
     Arm_state = 0
     PTP_Angle = [0, 0, 0, 0, -90, 0]                 # ANGLE
+    PTP_Angle2 = [20, 0, 0, 0, -90, 0]  
+    PTP_Angle3 = [-30, 0, 0, 0, -90, 0]  
     PTP_XYZ   = [204.049, 368, 293.5, 180, 0, 90]    # XYZABC
     LIN_Angle = [0, 0, 0, 0, -90, 90]                # ANGLE
     LIN_XYZ   = [204.049, 368, 110, 180, 0, 90]      # XYZABC
@@ -53,15 +55,26 @@ if __name__ == "__main__":
         # modbus.CIRC(10, 10, 1, 0, C_CIRC_centre, C_CIRC_end)
 
         # modbus.DO(IO_Port,0) # 1 -> on ; 0 -> off
-        while 1:
-            # rospy.init_node('libmodbus_ROS')
+        hiwin_libmodbus.MOTOR_EXCITE()
+            
+        hiwin_libmodbus.PTP(0, 200, 10, 1, 0, PTP_Angle)
+        hiwin_libmodbus.PTP(0, 200, 10, 1, 0, PTP_Angle2)
+        
+        hiwin_libmodbus.HOME()
+        # hiwin_libmodbus.PTP(0, 200, 10, 1, 0, PTP_Angle3)
+        # while 1:
+        #     # rospy.init_node('libmodbus_ROS')
 
-            # modbus.Holding_Registers_init()
-            # modbus.HOME() # 1 RUN
-            # modbus.PTP(0, 200, 10, 1, 0, C_PTP_Angle)
-            # modbus.DO(IO_Port,0) # 1 -> on ; 0 -> off
-            if(hiwin_libmodbus.Arm_State_REGISTERS() == 1):
-                break
+        #     # hiwin_libmodbus.HOME() # 1 RUN
+        #     hiwin_libmodbus.MOTOR_EXCITE()
+            
+        #     hiwin_libmodbus.PTP(0, 200, 10, 1, 0, PTP_Angle)
+        #     hiwin_libmodbus.PTP(0, 200, 10, 1, 0, PTP_Angle2)
+        #     hiwin_libmodbus.STOP()
+        #     hiwin_libmodbus.PTP(0, 200, 10, 1, 0, PTP_Angle3)
+        #     # modbus.DO(IO_Port,0) # 1 -> on ; 0 -> off
+        #     if(hiwin_libmodbus.Arm_State_REGISTERS() == 1):
+        #         break
 
         hiwin_libmodbus.Modbus_Close()
     else:
