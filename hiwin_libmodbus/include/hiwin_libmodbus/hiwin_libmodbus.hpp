@@ -58,6 +58,9 @@ public:
   void PTP(
     int type, int vel, int acc, int TOOL, int BASE, double *Angle);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
+  void PTP(
+  //   int type, int vel, int acc, int TOOL, int BASE, const_ Angle);
+  // HIWIN_LIBMODBUS_PUBLIC_TYPE
   void LIN(
     int type, int vel, int acc, int TOOL, int BASE, double *XYZ);
   void MOTOR_EXCITE();
