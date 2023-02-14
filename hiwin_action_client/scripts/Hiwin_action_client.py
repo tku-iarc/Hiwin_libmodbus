@@ -81,6 +81,7 @@ class HiwinmodbusActionClient(Node):
 
     def call_HOME(self):
         self.command_msg.mode  ='HOME'
+        self.command_msg.type = 0
         return self.send_command()
 
 
@@ -92,6 +93,7 @@ class HiwinmodbusActionClient(Node):
         return self.send_command()
 
     def call_Modbus_Close(self):
+
         self.command_msg.mode  ='close'
         print("Modbus Close") 
         return self.send_command()
