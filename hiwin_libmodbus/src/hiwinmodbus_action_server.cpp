@@ -11,7 +11,7 @@
 
 #include "hiwin_libmodbus//visibility_control.h"
 
-namespace hiwin_modbus_cpp
+namespace hiwinmodbus_action_server_cpp
 {
 
 class HiwinmodbusActionServer : public rclcpp::Node
@@ -41,36 +41,31 @@ private:
 
   rclcpp_action::GoalResponse handle_goal(
     const rclcpp_action::GoalUUID & uuid,
-    std::shared_ptr<const Hiwinmodbus::Goal> goal)
+    std::shared_ptr<const Hiwinmodbus::Goal> Command)
   {
-    RCLCPP_INFO(this->get_logger(), "Received goal request with mode %s", goal->mode);
+    RCLCPP_INFO(this->get_logger(), "Received goal request with mode %s", command->mode);
     (void)uuid;
-    // Let's reject sequences that are over 9000
-    if (goal->type==NULL) {
+    // reject if no mode
+    if (command->type==NULL) {
       return rclcpp_action::GoalResponse::REJECT;
     }
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
 
   rclcpp_action::CancelResponse handle_cancel(
-    const std::shared_ptr<GoalHandleHiwinmodbus> goal_handle)
+    const std::shared_ptr<GoalHandleHiwinmodbus> command_handle)
   {
     RCLCPP_INFO(this->get_logger(), "Received request to cancel goal");
-    (void)goal_handle;
+    (void)command_handle;
     return rclcpp_action::CancelResponse::ACCEPT;
   }
-  void convert_double(const double * temp){
 
-    double *convert_temp = const_cast<double *>(temp);
-
-  }
-
-  void execute(const std::shared_ptr<GoalHandleHiwinmodbus> goal_handle)
+  void execute(const std::shared_ptr<GoalHandleHiwinmodbus> command_handle)
   {
     HiwinLibmodbus hiwinlibmodbus;
     RCLCPP_INFO(this->get_logger(), "Executing goal");
     rclcpp::Rate loop_rate(1);
-    const auto goal = goal_handle->get_goal();
+    const auto command = command_handle->get_goal();
     auto feedback = std::make_shared<Hiwinmodbus::Feedback>();
     auto & sequence = feedback->partial_sequence;
     // sequence.push_back(0);
@@ -88,79 +83,72 @@ private:
     // }
 
 
-    if (goal->mode == "connect") {
-        hiwinlibmodbus.libModbus_Connect(goal->ip_address);
+    if (command->mode == "connect") {
+        hiwinlibmodbus.libModbus_Connect(command->ip_address);
         hiwinlibmodbus.Holding_Registers_init();
         hiwinlibmodbus.MOTOR_EXCITE();
       }
 
-    // else if (goal->mode == 'MOTOR_EXCITE'){
-    // }
-    else if (goal->mode == "PTP"){
-      // double *angle = goal->angle
-        // double* angle = &goal->angle[0];
-        // double a = &goal->angle[0];
-        double a = &goal->angle;
-        convert_double(&a);
-        double *angle = &a;
-        hiwinlibmodbus.PTP(goal->type, goal->vel, goal->acc, goal->tool, goal->base, angle);    
+    else if (command->mode == "PTP"){
+        hiwinlibmodbus.PTP(command->type, command->vel, command->acc, command->tool, command->base, command->angle);    
     }
-    // else if (goal->mode == "LIN"){
-    //   const double* xyz = &goal->xyz[0];
-    //     hiwinlibmodbus.LIN(goal->type, goal->vel, goal->acc, goal->tool, goal->base, xyz);    
-    // }
-    // else if (goal->mode == "CIRC"){
-    //     double* circ_s = &goal->circ_s[0];
-    //     double* circ_end = &goal->circ_end[0];
-    //     hiwinlibmodbus.CIRC(goal->vel, goal->acc, goal->tool, goal->base, circ_s, circ_end);    
-    // }
+    else if (command->mode == "LIN"){
+        hiwinlibmodbus.LIN(command->type, command->vel, command->acc, command->tool, command->base, command->xyz);    
+    }
+    else if (command->mode == "CIRC"){
+        hiwinlibmodbus.CIRC(command->vel, command->acc, command->tool, command->base, command->circ_s, command->circ_end);    
+    }
+    else if (command->mode == "DO"){
+        hiwinlibmodbus.DO(command->digital_output, command->onoff);    
+    }
 /*********************
   value   joint 
   0~5 -> A1~A6 
   value  Cartesian
   6~11 -> XYZABC 
 *********************/
-    else if (goal->mode == "JOG"){
-        hiwinlibmodbus.JOG(goal->joint, goal->dir);    
+    else if (command->mode == "JOG"){
+        hiwinlibmodbus.JOG(command->joint, command->dir);    
     }
     //   // Update sequence
     //   sequence.push_back(sequence[i] + sequence[i - 1]);
     //   // Publish feedback
     //   goal_handle->publish_feedback(feedback);
     //   RCLCPP_INFO(this->get_logger(), "Publish Feedback");
-
-      loop_rate.sleep();
+    else if (command->mode == "HOME"){
+        hiwinlibmodbus.HOME();
+    }
+    else if (command->mode == "close"){
+        hiwinlibmodbus.Modbus_Close();
+    }
+    loop_rate.sleep();
     // }
 
     // Check if goal is done
     if (rclcpp::ok()) {
       result->sequence = sequence;
-      goal_handle->succeed(result);
+      command_handle->succeed(result);
       RCLCPP_INFO(this->get_logger(), "Goal Succeeded");
     }
   }
 
-  void handle_accepted(const std::shared_ptr<GoalHandleHiwinmodbus> goal_handle)
+  void handle_accepted(const std::shared_ptr<GoalHandleHiwinmodbus> command_handle)
   {
     using namespace std::placeholders;
     // this needs to return quickly to avoid blocking the executor, so spin up a new thread
-    std::thread{std::bind(&HiwinmodbusActionServer::execute, this, _1), goal_handle}.detach();
+    std::thread{std::bind(&HiwinmodbusActionServer::execute, this, _1), command_handle}.detach();
   }
 };  // class HiwinmodbusActionServer
-};// namespace hiwin_libmodbus_cpp
+};// namespace hiwinmodbus_action_server_cpp
 
-// HiwinLibmodbus* HiwinLibmodbusConstructor()
-// {
-//   return new HiwinLibmodbus();
-// }
 
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
 
-  // auto action_server = std::make_shared<HiwinmodbusActionServer>();
+  auto action_server = std::make_shared<hiwinmodbus_action_server_cpp::HiwinmodbusActionServer>();
 
-  // rclcpp::spin(action_server);
+  rclcpp::spin(action_server);
 
   rclcpp::shutdown();
   return 0;

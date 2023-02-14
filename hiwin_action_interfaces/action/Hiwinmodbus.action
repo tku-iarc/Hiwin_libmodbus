@@ -5,7 +5,8 @@ int32 vel
 int32 acc 
 int32 tool
 int32 base
-int32[] digital_output 
+int32 digital_output 
+int32 onoff
 #Digital_output[DO_Num, 0or1]
 float64[] angle
 float64[] xyz
