@@ -156,7 +156,7 @@ ament_target_dependencies(action_server
   "rclcpp"
   "rclcpp_action"
   "rclcpp_components")
-rclcpp_components_register_node(action_server PLUGIN "action_tutorials_cpp::FibonacciActionServer" EXECUTABLE fibonacci_action_server)
+rclcpp_components_register_node(action_server PLUGIN "hiwinmodbus_action_server_cpp::HiwinmodbusActionServer" EXECUTABLE hiwinmodbus_action_server)
 install(TARGETS
   action_server
   ARCHIVE DESTINATION lib
@@ -166,15 +166,15 @@ install(TARGETS
 
 
 add_executable(hiwin_libmodbus_node src/hiwin_libmodbus_node.cpp)
-add_executable(hiwinmodbus_action_server src/hiwinmodbus_action_server.cpp)
-ament_target_dependencies(hiwinmodbus_action_server
-  "rclcpp"
-  "rclcpp_action"
-  "rclcpp_components"
-  "hiwin_action_interfaces")
-target_link_libraries(hiwinmodbus_action_server
-  ${PROJECT_NAME}
-)
+#add_executable(hiwinmodbus_action_server src/hiwinmodbus_action_server.cpp)
+#ament_target_dependencies(hiwinmodbus_action_server
+#  "rclcpp"
+# "rclcpp_action"
+#  "rclcpp_components"
+#  "hiwin_action_interfaces")
+#target_link_libraries(hiwinmodbus_action_server
+#  ${PROJECT_NAME}
+#)
 
 target_include_directories(hiwin_libmodbus_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

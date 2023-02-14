@@ -60,6 +60,13 @@ private:
     return rclcpp_action::CancelResponse::ACCEPT;
   }
 
+  void handle_accepted(const std::shared_ptr<GoalHandleHiwinmodbus> command_handle)
+  {
+    using namespace std::placeholders;
+    // this needs to return quickly to avoid blocking the executor, so spin up a new thread
+    std::thread{std::bind(&HiwinmodbusActionServer::execute, this, _1), command_handle}.detach();
+  }
+  
   void execute(const std::shared_ptr<GoalHandleHiwinmodbus> command_handle)
   {
     HiwinLibmodbus hiwinlibmodbus;
@@ -132,27 +139,21 @@ private:
     }
   }
 
-  void handle_accepted(const std::shared_ptr<GoalHandleHiwinmodbus> command_handle)
-  {
-    using namespace std::placeholders;
-    // this needs to return quickly to avoid blocking the executor, so spin up a new thread
-    std::thread{std::bind(&HiwinmodbusActionServer::execute, this, _1), command_handle}.detach();
-  }
 };  // class HiwinmodbusActionServer
 };// namespace hiwinmodbus_action_server_cpp
 
 
-int main(int argc, char ** argv)
-{
-  rclcpp::init(argc, argv);
+// int main(int argc, char ** argv)
+// {
+//   rclcpp::init(argc, argv);
 
-  auto action_server = std::make_shared<hiwinmodbus_action_server_cpp::HiwinmodbusActionServer>();
+//   auto action_server = std::make_shared<hiwinmodbus_action_server_cpp::HiwinmodbusActionServer>();
 
-  rclcpp::spin(action_server);
+//   rclcpp::spin(action_server);
 
-  rclcpp::shutdown();
-  return 0;
-}
+//   rclcpp::shutdown();
+//   return 0;
+// }
 
 
-// RCLCPP_COMPONENTS_REGISTER_NODE(action_tutorials_cpp::FibonacciActionServer)
+RCLCPP_COMPONENTS_REGISTER_NODE(hiwinmodbus_action_server_cpp::HiwinmodbusActionServer)

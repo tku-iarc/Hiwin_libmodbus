@@ -20,7 +20,7 @@ class HiwinmodbusActionClient(Node):
 
     def __init__(self):
         super().__init__('hiwinmodbus_action_client')
-        self._action_client = ActionClient(self, Hiwinmodbus, 'hiwinmodbus')
+        self._action_client = ActionClient(self, Hiwinmodbus, 'Hiwinmodbus')
         self.command_msg = Hiwinmodbus.Goal()
         self.command_msg.ip_address = '192.168.0.1'
 
@@ -29,6 +29,12 @@ class HiwinmodbusActionClient(Node):
         self._action_client.wait_for_server()
 
         return self._action_client.send_goal_async(self.command_msg)
+    
+    def call_Connect(self):
+
+        self.command_msg.mode  ='connect'
+        return self.send_command()    
+
 
     def call_PTP(self, type, vel, acc, tool, base, angle):
 
@@ -87,6 +93,7 @@ class HiwinmodbusActionClient(Node):
 
     def call_Modbus_Close(self):
         self.command_msg.mode  ='close'
+        print("Modbus Close") 
         return self.send_command()
 
 def main(args=None):
@@ -94,13 +101,22 @@ def main(args=None):
 
     action_client = HiwinmodbusActionClient()
 
-    future = action_client.call_HOME()
+    
+    action_client.call_Connect()
+    action_client.call_HOME()
+    action_client.call_Modbus_Close()
 
-    rclpy.spin_until_future_complete(action_client, future)
+    
+    rclpy.spin(action_client)
+    
+
+    # future = action_client.call_HOME()
+
+    # rclpy.spin_until_future_complete(action_client, future)
 
 if __name__ == "__main__":
     main()
-    print("Modbus Close")  
+     
 
     
 
