@@ -41,7 +41,7 @@ private:
 
   rclcpp_action::GoalResponse handle_goal(
     const rclcpp_action::GoalUUID & uuid,
-    std::shared_ptr<const Hiwinmodbus::Goal> Command)
+    std::shared_ptr<const Hiwinmodbus::Goal> command)
   {
     RCLCPP_INFO(this->get_logger(), "Received goal request with mode %s", command->mode);
     (void)uuid;
