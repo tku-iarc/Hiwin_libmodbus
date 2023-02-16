@@ -46,7 +46,7 @@ private:
     RCLCPP_INFO(this->get_logger(), "Received goal request with mode %s", command->mode);
     (void)uuid;
     // reject if no mode
-    HiwinLibmodbus hiwinlibmodbus;
+    // HiwinLibmodbus hiwinlibmodbus;
 
     std::cout<<command->mode<<std::endl;
 
@@ -55,8 +55,73 @@ private:
       return rclcpp_action::GoalResponse::REJECT;
     }
 
+//     if (command->mode == "connect") {
+//       std::cout<<"afjioaljfl;kjaklfaf;"<<std::endl;
+//         hiwinlibmodbus.libModbus_Connect(command->ip_address);
+//         hiwinlibmodbus.Holding_Registers_init();
+//         hiwinlibmodbus.MOTOR_EXCITE();
+//       }
+
+//     else if (command->mode == "PTP"){
+//         hiwinlibmodbus.PTP(command->type, command->vel, command->acc, command->tool, command->base, command->angle);    
+//     }
+//     else if (command->mode == "LIN"){
+//         hiwinlibmodbus.LIN(command->type, command->vel, command->acc, command->tool, command->base, command->xyz);    
+//     }
+//     else if (command->mode == "CIRC"){
+//         hiwinlibmodbus.CIRC(command->vel, command->acc, command->tool, command->base, command->circ_s, command->circ_end);    
+//     }
+//     else if (command->mode == "DO"){
+//         hiwinlibmodbus.DO(command->digital_output, command->onoff);    
+//     }
+// /*********************
+//   value   joint 
+//   0~5 -> A1~A6 
+//   value  Cartesian
+//   6~11 -> XYZABC 
+// *********************/
+//     else if (command->mode == "JOG"){
+//         hiwinlibmodbus.JOG(command->joint, command->dir);    
+//     }
+//     else if (command->mode == "HOME"){
+//         hiwinlibmodbus.HOME();
+//     }
+//     else if (command->mode == "close"){
+//         hiwinlibmodbus.Modbus_Close();
+//     }
+    return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
+  }
+
+  rclcpp_action::CancelResponse handle_cancel(
+    const std::shared_ptr<GoalHandleHiwinmodbus> command_handle)
+  {
+    RCLCPP_INFO(this->get_logger(), "Received request to cancel goal");
+    (void)command_handle;
+    return rclcpp_action::CancelResponse::ACCEPT;
+  }
+
+  void handle_accepted(const std::shared_ptr<GoalHandleHiwinmodbus> command_handle)
+  {
+    using namespace std::placeholders;
+    // this needs to return quickly to avoid blocking the executor, so spin up a new thread
+    std::thread{std::bind(&HiwinmodbusActionServer::execute, this, _1), command_handle}.detach();
+  }
+
+  void execute(const std::shared_ptr<GoalHandleHiwinmodbus> command_handle)
+  {
+    HiwinLibmodbus hiwinlibmodbus;
+    RCLCPP_INFO(this->get_logger(), "Executing goal");
+    rclcpp::Rate loop_rate(1);
+    const auto command = command_handle->get_goal();
+    auto feedback = std::make_shared<Hiwinmodbus::Feedback>();
+    
+    auto & sequence = feedback->partial_sequence;
+    // sequence.push_back(0);
+    // sequence.push_back(1);
+    auto result = std::make_shared<Hiwinmodbus::Result>();
+
     if (command->mode == "connect") {
-      std::cout<<"afjioaljfl;kjaklfaf;"<<std::endl;
+      // std::cout<<"afjioaljfl;kjaklfaf;"<<std::endl;
         hiwinlibmodbus.libModbus_Connect(command->ip_address);
         hiwinlibmodbus.Holding_Registers_init();
         hiwinlibmodbus.MOTOR_EXCITE();
@@ -84,40 +149,13 @@ private:
         hiwinlibmodbus.JOG(command->joint, command->dir);    
     }
     else if (command->mode == "HOME"){
+        std::cout<<"afjioaljfl;kjaklfaf;"<<std::endl;
         hiwinlibmodbus.HOME();
     }
     else if (command->mode == "close"){
         hiwinlibmodbus.Modbus_Close();
     }
-    return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
-  }
 
-  rclcpp_action::CancelResponse handle_cancel(
-    const std::shared_ptr<GoalHandleHiwinmodbus> command_handle)
-  {
-    RCLCPP_INFO(this->get_logger(), "Received request to cancel goal");
-    (void)command_handle;
-    return rclcpp_action::CancelResponse::ACCEPT;
-  }
-
-  void handle_accepted(const std::shared_ptr<GoalHandleHiwinmodbus> command_handle)
-  {
-    using namespace std::placeholders;
-    // this needs to return quickly to avoid blocking the executor, so spin up a new thread
-    std::thread{std::bind(&HiwinmodbusActionServer::execute, this, _1), command_handle}.detach();
-  }
-
-  void execute(const std::shared_ptr<GoalHandleHiwinmodbus> command_handle)
-  {
-    
-    RCLCPP_INFO(this->get_logger(), "Executing goal");
-    rclcpp::Rate loop_rate(1);
-    const auto command = command_handle->get_goal();
-    auto feedback = std::make_shared<Hiwinmodbus::Feedback>();
-    auto & sequence = feedback->partial_sequence;
-    // sequence.push_back(0);
-    // sequence.push_back(1);
-    auto result = std::make_shared<Hiwinmodbus::Result>();
 
     // for (int i = 1; (i < goal->type) && rclcpp::ok(); ++i) {
     //   // Check if there is a cancel request

@@ -109,7 +109,7 @@ def main(args=None):
     action_client.call_Modbus_Close()
 
     
-    rclpy.spin(action_client)
+    # rclpy.spin(action_client)
     
 
     # future = action_client.call_HOME()
