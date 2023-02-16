@@ -114,9 +114,10 @@ void HiwinLibmodbus::HOME(){
 }
 void HiwinLibmodbus::PTP(int type, int vel, int acc, int TOOL, int BASE, const std::vector<double> Angle){
   std::cout<<"????????????????????"<<std::endl;
-  return PTP(type, vel, acc, TOOL, BASE, Angle);
+  const double* angle = &Angle[0];
+  return PTP(type, vel, acc, TOOL, BASE, angle);
 }
-void HiwinLibmodbus::PTP(int type, int vel, int acc, int TOOL, int BASE, double *Angle){
+void HiwinLibmodbus::PTP(int type, int vel, int acc, int TOOL, int BASE, const double *Angle){
   // double Angle[6] = {joint1, joint2, joint3, joint4, joint5, joint6};
   // TODO: the arguments should be defined, 
   // number can't be directly written here, people will confused what it is.
@@ -164,7 +165,7 @@ void HiwinLibmodbus::LIN(int type, int vel, int acc, int TOOL, int BASE, std::ve
   
   return LIN(type, vel, acc, TOOL, BASE, XYZ);
 }
-void HiwinLibmodbus::LIN(int type, int vel, int acc, int TOOL, int BASE, double *XYZ){
+void HiwinLibmodbus::LIN(int type, int vel, int acc, int TOOL, int BASE, const double *XYZ){
   // double Angle[6] = {x, y, z, a, b, c};
   // TODO: the arguments should be defined, 
   // number can't be directly written here, people will confused what it is.
@@ -211,7 +212,7 @@ void HiwinLibmodbus::LIN(int type, int vel, int acc, int TOOL, int BASE, double 
 void HiwinLibmodbus::CIRC(int vel, int acc, int TOOL, int BASE, std::vector<double> CIRC_s, std::vector<double> CIRC_end){
   return CIRC(vel, acc, TOOL, BASE, CIRC_s, CIRC_end);
 }
-void HiwinLibmodbus::CIRC(int vel, int acc, int TOOL, int BASE, double *CIRC_s, double *CIRC_end){
+void HiwinLibmodbus::CIRC(int vel, int acc, int TOOL, int BASE, const double *CIRC_s, const double *CIRC_end){
   // TODO: the arguments should be defined, 
   // number can't be directly written here, people will confused what it is.
   double start_L[6] = {0};

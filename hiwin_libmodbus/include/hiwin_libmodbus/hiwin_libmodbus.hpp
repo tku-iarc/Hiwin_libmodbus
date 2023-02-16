@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <string>
 #include <vector>
+#include <typeinfo>
  
 #include <modbus.h>
  
@@ -60,19 +61,19 @@ public:
     int type, int vel, int acc, int TOOL, int BASE, const std::vector<double> Angle);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void PTP(
-    int type, int vel, int acc, int TOOL, int BASE, double *Angle);
+    int type, int vel, int acc, int TOOL, int BASE, const double *Angle);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void LIN(
     int type, int vel, int acc, int TOOL, int BASE, std::vector<double> XYZ);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void LIN(
-    int type, int vel, int acc, int TOOL, int BASE, double *XYZ);
+    int type, int vel, int acc, int TOOL, int BASE, const double *XYZ);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void CIRC(
     int vel, int acc, int TOOL, int BASE, std::vector<double> CIRC_s, std::vector<double> CIRC_end);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void CIRC(
-    int vel, int acc, int TOOL, int BASE, double *CIRC_s, double *CIRC_end);
+    int vel, int acc, int TOOL, int BASE, const double *CIRC_s, const double *CIRC_end);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void JOG(
     int joint,int dir);
