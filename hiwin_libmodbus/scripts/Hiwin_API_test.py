@@ -5,7 +5,7 @@
 # from operator import mod
 # import numpy as np
 from ctypes import *
-# import time
+import time
 # import rospy
 
 from hiwin_libmodbus import HiwinLibmodbus
@@ -59,21 +59,24 @@ if __name__ == "__main__":
             
         hiwin_libmodbus.PTP(0, 200, 10, 1, 0, PTP_Angle)
         hiwin_libmodbus.PTP(0, 200, 10, 1, 0, PTP_Angle2)
+        # # input()
+        # hiwin_libmodbus.HOME()
         
-        hiwin_libmodbus.HOME()
         # hiwin_libmodbus.PTP(0, 200, 10, 1, 0, PTP_Angle3)
         # while 1:
-        # # #     # rospy.init_node('libmodbus_ROS')
-        #     # hiwin_libmodbus.MOTOR_EXCITE()
-        #     # hiwin_libmodbus.HOME() # 1 RUN
-        #     print("fffuuuuccckk")
-        #     hiwin_libmodbus.MOTOR_EXCITE()
+        # # # #     # rospy.init_node('libmodbus_ROS')
+        # #     # hiwin_libmodbus.MOTOR_EXCITE()
+        #     hiwin_libmodbus.HOME() # 1 RUN
+        #     time.sleep(1)
+        #     # hiwin_libmodbus.HOME()
+        # #     print("fffuuuuccckk")
+        # #     hiwin_libmodbus.MOTOR_EXCITE()
             
-        # # #     hiwin_libmodbus.PTP(0, 200, 10, 1, 0, PTP_Angle)
-        # # #     hiwin_libmodbus.PTP(0, 200, 10, 1, 0, PTP_Angle2)
-        # # #     hiwin_libmodbus.STOP()
-        # # #     hiwin_libmodbus.PTP(0, 200, 10, 1, 0, PTP_Angle3)
-        # # #     # modbus.DO(IO_Port,0) # 1 -> on ; 0 -> off
+        # # # #     hiwin_libmodbus.PTP(0, 200, 10, 1, 0, PTP_Angle)
+        # # # #     hiwin_libmodbus.PTP(0, 200, 10, 1, 0, PTP_Angle2)
+        # # # #     hiwin_libmodbus.STOP()
+        # # # #     hiwin_libmodbus.PTP(0, 200, 10, 1, 0, PTP_Angle3)
+        # # # #     # modbus.DO(IO_Port,0) # 1 -> on ; 0 -> off
         #     if(hiwin_libmodbus.Arm_State_REGISTERS() == 1):
         #         break
 

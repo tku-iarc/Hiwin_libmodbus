@@ -35,6 +35,7 @@ int HiwinLibmodbus::libModbus_Connect(const wchar_t * ip_address){
 int HiwinLibmodbus::libModbus_Connect(const char *ip_address){
   /***** set IP and Port *****/
   ctx_ = modbus_new_tcp(ip_address, MODBUS_SERVER_PORT);
+  std::cout<<ctx_<<std::endl;
  
   /* Debug mode */
   modbus_set_debug(ctx_, TRUE);
@@ -57,6 +58,7 @@ int HiwinLibmodbus::libModbus_Connect(const char *ip_address){
 }
 
 void HiwinLibmodbus::Modbus_Close(){ 
+  // std::cout<<"ffffffffffffffffffffffffffffffffk"<<std::endl;
   modbus_free(ctx_);
   modbus_close(ctx_);
 }
@@ -113,7 +115,6 @@ void HiwinLibmodbus::HOME(){
   wrt_ = modbus_write_register(ctx_, 200, 1);
 }
 void HiwinLibmodbus::PTP(int type, int vel, int acc, int TOOL, int BASE, const std::vector<double> Angle){
-  std::cout<<"????????????????????"<<std::endl;
   const double* angle = &Angle[0];
   return PTP(type, vel, acc, TOOL, BASE, angle);
 }
@@ -122,6 +123,12 @@ void HiwinLibmodbus::PTP(int type, int vel, int acc, int TOOL, int BASE, const d
   // TODO: the arguments should be defined, 
   // number can't be directly written here, people will confused what it is.
   std::cout<<"$$$$$$$$$$$$$$$$$$$$$"<<std::endl;
+  std::cout<<type<<std::endl;
+  std::cout<<vel<<std::endl;
+  std::cout<<acc<<std::endl;
+  std::cout<<TOOL<<std::endl;
+  std::cout<<BASE<<std::endl;
+  std::cout<<*Angle<<std::endl;
   double A_L[6] = {0};
   double A_H[6] = {0};
   double num = 0;
@@ -158,12 +165,15 @@ void HiwinLibmodbus::PTP(int type, int vel, int acc, int TOOL, int BASE, const d
   /*********************** test ***********************/
 
   wrt_ = modbus_write_registers(ctx_, REGISTERS_ADDRESS, 26, table);
+  std::cout<<wrt_<<std::endl;
   wrt_ = modbus_write_register(ctx_, 200, 1);
+  std::cout<<wrt_<<std::endl;
+  std::cout<<"#########################"<<std::endl;
 }
 
 void HiwinLibmodbus::LIN(int type, int vel, int acc, int TOOL, int BASE, std::vector<double> XYZ){
-  
-  return LIN(type, vel, acc, TOOL, BASE, XYZ);
+  const double* xyz = &XYZ[0];  
+  return LIN(type, vel, acc, TOOL, BASE, xyz);
 }
 void HiwinLibmodbus::LIN(int type, int vel, int acc, int TOOL, int BASE, const double *XYZ){
   // double Angle[6] = {x, y, z, a, b, c};
@@ -210,7 +220,9 @@ void HiwinLibmodbus::LIN(int type, int vel, int acc, int TOOL, int BASE, const d
 
 
 void HiwinLibmodbus::CIRC(int vel, int acc, int TOOL, int BASE, std::vector<double> CIRC_s, std::vector<double> CIRC_end){
-  return CIRC(vel, acc, TOOL, BASE, CIRC_s, CIRC_end);
+  const double* circ_s = &CIRC_s[0];  
+  const double* circ_end = &CIRC_end[0];  
+  return CIRC(vel, acc, TOOL, BASE, circ_s, circ_end);
 }
 void HiwinLibmodbus::CIRC(int vel, int acc, int TOOL, int BASE, const double *CIRC_s, const double *CIRC_end){
   // TODO: the arguments should be defined, 

@@ -33,6 +33,7 @@
 class HiwinLibmodbus
 {
 public:
+  
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   HiwinLibmodbus();
   HIWIN_LIBMODBUS_PUBLIC_TYPE

@@ -132,22 +132,20 @@ private:
         if(hiwinlibmodbus.libModbus_Connect(command->ip_address)&& rclcpp::ok()){
           std::cout<<"----------------------------------"<<std::endl;
           hiwinlibmodbus.Holding_Registers_init();
+          // std::cout<<hiwinlibmodbus.ctx_<<std::endl;
           // hiwinlibmodbus.MOTOR_EXCITE();
         }
       }
-    // if (command->mode == "Hold"){
-    //     hiwinlibmodbus.Holding_Registers_init();
-    // }
     else if (command->mode == "PTP"){
         hiwinlibmodbus.PTP(command->type, command->vel, command->acc, command->tool, command->base, command->angle);
         std::cout<<"afjioaljfl;kjaklfaf;"<<std::endl;    
     }
-    // else if (command->mode == "LIN"){
-    //     hiwinlibmodbus.LIN(command->type, command->vel, command->acc, command->tool, command->base, command->xyz);    
-    // }
-    // else if (command->mode == "CIRC"){
-    //     hiwinlibmodbus.CIRC(command->vel, command->acc, command->tool, command->base, command->circ_s, command->circ_end);    
-    // }
+    else if (command->mode == "LIN"){
+        hiwinlibmodbus.LIN(command->type, command->vel, command->acc, command->tool, command->base, command->xyz);    
+    }
+    else if (command->mode == "CIRC"){
+        hiwinlibmodbus.CIRC(command->vel, command->acc, command->tool, command->base, command->circ_s, command->circ_end);    
+    }
     else if (command->mode == "DO"){
         hiwinlibmodbus.DO(command->digital_output, command->onoff);    
     }
