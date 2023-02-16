@@ -35,11 +35,10 @@ class HiwinmodbusActionClient(Node):
         self.command_msg.mode  ='connect'
         return self.send_command()    
 
-    def call_MOTOR_EXCITE(self):
+    def call_Holding_Registers_init(self):
 
-        self.command_msg.mode  ='MOTOR_EXCITE'
-        return self.send_command()    
-
+        self.command_msg.mode  ='Hold'
+        return self.send_command() 
 
     def call_PTP(self, type, vel, acc, tool, base, angle):
 
@@ -104,6 +103,8 @@ class HiwinmodbusActionClient(Node):
         return self.send_command()
 
 def main(args=None):
+    PTP_Angle = [0.00, 0.00, 0.00, 0.00, -90.00, 0.00]                 # ANGLE
+    PTP_Angle2 = [20.00, 0.00, 0.00, 0.00, -90.00, 0.00]  
     rclpy.init(args=args)
 
     action_client = HiwinmodbusActionClient()
@@ -111,9 +112,13 @@ def main(args=None):
     
     action_client.call_Connect()
     input()
-    # action_client.call_MOTOR_EXCITE()
+    # action_client.call_Holding_Registers_init()
     # input()
-    action_client.call_HOME()
+    # action_client.call_HOME()
+    # input()
+    action_client.call_PTP(0,200,10,1,0,PTP_Angle)
+    input()
+    action_client.call_PTP(0,200,10,1,0,PTP_Angle2)
     input()
     action_client.call_Modbus_Close()
 

@@ -60,10 +60,6 @@ class HiwinLibmodbus(object):
     self.hiwin_lib.LIN(self.hiwin_libmodbus_ptr, type, vel, acc, TOOL, BASE, xyz)
     return
 
-  def MOTOR_EXCITE(self):
-    return
-
-
   def CIRC(self, vel, acc, TOOL, BASE, CIRC_s, CIRC_end):
     c_circ_s = self.list_to_double_array(CIRC_s)
     c_circ_end = self.list_to_double_array(CIRC_end)

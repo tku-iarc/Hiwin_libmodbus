@@ -54,14 +54,14 @@ private:
       std::cout<<"--------------------"<<std::endl;
       return rclcpp_action::GoalResponse::REJECT;
     }
-    if (command->mode == "connect") {
-      // std::cout<<"afjioaljfl;kjaklfaf;"<<std::endl;
-        if(hiwinlibmodbus.libModbus_Connect(command->ip_address)){
-          std::cout<<"----------------------------------"<<std::endl;
-          hiwinlibmodbus.Holding_Registers_init();
-          hiwinlibmodbus.MOTOR_EXCITE();
-        }
-      }
+    // if (command->mode == "connect") {
+    //   // std::cout<<"afjioaljfl;kjaklfaf;"<<std::endl;
+    //     if(hiwinlibmodbus.libModbus_Connect(command->ip_address)){
+    //       std::cout<<"----------------------------------"<<std::endl;
+    //       // hiwinlibmodbus.Holding_Registers_init();
+    //       // hiwinlibmodbus.MOTOR_EXCITE();
+    //     }
+      // }
 //     if (command->mode == "connect") {
 //       std::cout<<"afjioaljfl;kjaklfaf;"<<std::endl;
 //         hiwinlibmodbus.libModbus_Connect(command->ip_address);
@@ -127,21 +127,21 @@ private:
     // sequence.push_back(1);
     auto result = std::make_shared<Hiwinmodbus::Result>();
 
-    // if (command->mode == "connect" && rclcpp::ok()) {
-    //   // std::cout<<"afjioaljfl;kjaklfaf;"<<std::endl;
-    //     if(hiwinlibmodbus.libModbus_Connect(command->ip_address)&& rclcpp::ok()){
-    //       std::cout<<"----------------------------------"<<std::endl;
-    //       hiwinlibmodbus.Holding_Registers_init();
-    //       // hiwinlibmodbus.MOTOR_EXCITE();
-    //     }
-    //   }
-    if (command->mode == "MOTOR_EXCITE"&& rclcpp::ok()) {  
-        // hiwinlibmodbus.Holding_Registers_init();
-        hiwinlibmodbus.MOTOR_EXCITE();
-    }
-    // else if (command->mode == "PTP"){
-    //     hiwinlibmodbus.PTP(command->type, command->vel, command->acc, command->tool, command->base, command->angle);    
+    if (command->mode == "connect" && rclcpp::ok()) {
+      // std::cout<<"afjioaljfl;kjaklfaf;"<<std::endl;
+        if(hiwinlibmodbus.libModbus_Connect(command->ip_address)&& rclcpp::ok()){
+          std::cout<<"----------------------------------"<<std::endl;
+          hiwinlibmodbus.Holding_Registers_init();
+          // hiwinlibmodbus.MOTOR_EXCITE();
+        }
+      }
+    // if (command->mode == "Hold"){
+    //     hiwinlibmodbus.Holding_Registers_init();
     // }
+    else if (command->mode == "PTP"){
+        hiwinlibmodbus.PTP(command->type, command->vel, command->acc, command->tool, command->base, command->angle);
+        std::cout<<"afjioaljfl;kjaklfaf;"<<std::endl;    
+    }
     // else if (command->mode == "LIN"){
     //     hiwinlibmodbus.LIN(command->type, command->vel, command->acc, command->tool, command->base, command->xyz);    
     // }
@@ -161,7 +161,6 @@ private:
         hiwinlibmodbus.JOG(command->joint, command->dir);    
     }
     else if (command->mode == "HOME"&& rclcpp::ok()){
-        std::cout<<"afjioaljfl;kjaklfaf;"<<std::endl;
         hiwinlibmodbus.HOME();
     }
     else if (command->mode == "close"){

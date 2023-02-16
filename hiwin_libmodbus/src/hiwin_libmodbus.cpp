@@ -18,6 +18,8 @@ void HiwinLibmodbus::Holding_Registers_init(){
   std::cout<<"999999999999999999999999999"<<std::endl;
   wrt_ = modbus_write_register(ctx_, 201, 6);
   wrt_ = modbus_write_register(ctx_, 200, 0);
+    //motor excite again, makesure it works
+  wrt_ = modbus_write_register(ctx_, 200, 0);
 }
 
 int HiwinLibmodbus::libModbus_Connect(const std::string& ip_address){
@@ -110,14 +112,15 @@ void HiwinLibmodbus::HOME(){
   wrt_ = modbus_write_registers(ctx_, REGISTERS_ADDRESS, 2, home_run);
   wrt_ = modbus_write_register(ctx_, 200, 1);
 }
-// void HiwinLibmodbus::PTP(int type, int vel, int acc, int TOOL, int BASE, std::vector<double> Angle){
-  
-//   return PTP(type, vel, acc, TOOL, BASE, Angle);
-// }
+void HiwinLibmodbus::PTP(int type, int vel, int acc, int TOOL, int BASE, const std::vector<double> Angle){
+  std::cout<<"????????????????????"<<std::endl;
+  return PTP(type, vel, acc, TOOL, BASE, Angle);
+}
 void HiwinLibmodbus::PTP(int type, int vel, int acc, int TOOL, int BASE, double *Angle){
   // double Angle[6] = {joint1, joint2, joint3, joint4, joint5, joint6};
   // TODO: the arguments should be defined, 
   // number can't be directly written here, people will confused what it is.
+  std::cout<<"$$$$$$$$$$$$$$$$$$$$$"<<std::endl;
   double A_L[6] = {0};
   double A_H[6] = {0};
   double num = 0;
@@ -157,10 +160,10 @@ void HiwinLibmodbus::PTP(int type, int vel, int acc, int TOOL, int BASE, double 
   wrt_ = modbus_write_register(ctx_, 200, 1);
 }
 
-// void HiwinLibmodbus::LIN(int type, int vel, int acc, int TOOL, int BASE, std::vector<double> XYZ){
+void HiwinLibmodbus::LIN(int type, int vel, int acc, int TOOL, int BASE, std::vector<double> XYZ){
   
-//   return LIN(type, vel, acc, TOOL, BASE, XYZ);
-// }
+  return LIN(type, vel, acc, TOOL, BASE, XYZ);
+}
 void HiwinLibmodbus::LIN(int type, int vel, int acc, int TOOL, int BASE, double *XYZ){
   // double Angle[6] = {x, y, z, a, b, c};
   // TODO: the arguments should be defined, 
@@ -204,14 +207,10 @@ void HiwinLibmodbus::LIN(int type, int vel, int acc, int TOOL, int BASE, double 
   wrt_ = modbus_write_register(ctx_, 200, 1);
 }
 
-void HiwinLibmodbus::MOTOR_EXCITE(){
-  std::cout<<"================================="<<std::endl;
-  wrt_ = modbus_write_register(ctx_, 200, 0);
-}
 
-// void HiwinLibmodbus::CIRC(int vel, int acc, int TOOL, int BASE, std::vector<double> CIRC_s, std::vector<double> CIRC_end){
-//   return CIRC(vel, acc, TOOL, BASE, CIRC_s, CIRC_end);
-// }
+void HiwinLibmodbus::CIRC(int vel, int acc, int TOOL, int BASE, std::vector<double> CIRC_s, std::vector<double> CIRC_end){
+  return CIRC(vel, acc, TOOL, BASE, CIRC_s, CIRC_end);
+}
 void HiwinLibmodbus::CIRC(int vel, int acc, int TOOL, int BASE, double *CIRC_s, double *CIRC_end){
   // TODO: the arguments should be defined, 
   // number can't be directly written here, people will confused what it is.
