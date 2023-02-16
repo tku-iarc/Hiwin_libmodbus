@@ -55,17 +55,17 @@ if __name__ == "__main__":
         # modbus.CIRC(10, 10, 1, 0, C_CIRC_centre, C_CIRC_end)
 
         # modbus.DO(IO_Port,0) # 1 -> on ; 0 -> off
-        hiwin_libmodbus.MOTOR_EXCITE()
+        # hiwin_libmodbus.MOTOR_EXCITE()
             
-        hiwin_libmodbus.PTP(0, 200, 10, 1, 0, PTP_Angle)
-        hiwin_libmodbus.PTP(0, 200, 10, 1, 0, PTP_Angle2)
+        # hiwin_libmodbus.PTP(0, 200, 10, 1, 0, PTP_Angle)
+        # hiwin_libmodbus.PTP(0, 200, 10, 1, 0, PTP_Angle2)
         
-        hiwin_libmodbus.HOME()
+        # hiwin_libmodbus.HOME()
         # hiwin_libmodbus.PTP(0, 200, 10, 1, 0, PTP_Angle3)
-        # while 1:
+        while 1:
         #     # rospy.init_node('libmodbus_ROS')
 
-        #     # hiwin_libmodbus.HOME() # 1 RUN
+            hiwin_libmodbus.HOME() # 1 RUN
         #     hiwin_libmodbus.MOTOR_EXCITE()
             
         #     hiwin_libmodbus.PTP(0, 200, 10, 1, 0, PTP_Angle)
@@ -73,8 +73,8 @@ if __name__ == "__main__":
         #     hiwin_libmodbus.STOP()
         #     hiwin_libmodbus.PTP(0, 200, 10, 1, 0, PTP_Angle3)
         #     # modbus.DO(IO_Port,0) # 1 -> on ; 0 -> off
-        #     if(hiwin_libmodbus.Arm_State_REGISTERS() == 1):
-        #         break
+            if(hiwin_libmodbus.Arm_State_REGISTERS() == 1):
+                break
 
         hiwin_libmodbus.Modbus_Close()
     else:

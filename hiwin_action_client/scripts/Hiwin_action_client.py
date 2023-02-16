@@ -35,6 +35,11 @@ class HiwinmodbusActionClient(Node):
         self.command_msg.mode  ='connect'
         return self.send_command()    
 
+    def call_MOTOR_EXCITE(self):
+
+        self.command_msg.mode  ='MOTOR_EXCITE'
+        return self.send_command()    
+
 
     def call_PTP(self, type, vel, acc, tool, base, angle):
 
@@ -105,7 +110,11 @@ def main(args=None):
 
     
     action_client.call_Connect()
+    input()
+    # action_client.call_MOTOR_EXCITE()
+    # input()
     action_client.call_HOME()
+    input()
     action_client.call_Modbus_Close()
 
     
