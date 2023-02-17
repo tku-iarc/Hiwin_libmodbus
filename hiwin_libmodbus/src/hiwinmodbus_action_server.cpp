@@ -19,6 +19,8 @@ class HiwinmodbusActionServer : public rclcpp::Node
 public:
   using Hiwinmodbus = hiwin_action_interfaces::action::Hiwinmodbus;
   using GoalHandleHiwinmodbus = rclcpp_action::ServerGoalHandle<Hiwinmodbus>;
+  HiwinLibmodbus hiwinlibmodbus;
+
 
   explicit HiwinmodbusActionServer(const rclcpp::NodeOptions & options = rclcpp::NodeOptions())
   : Node("Hiwinmodbus_action_server", options)
@@ -46,7 +48,6 @@ private:
     RCLCPP_INFO(this->get_logger(), "Received goal request with mode %s", command->mode);
     (void)uuid;
     // reject if no mode
-    HiwinLibmodbus hiwinlibmodbus;
 
     std::cout<<command->mode<<std::endl;
 
@@ -54,48 +55,6 @@ private:
       std::cout<<"--------------------"<<std::endl;
       return rclcpp_action::GoalResponse::REJECT;
     }
-    // if (command->mode == "connect") {
-    //   // std::cout<<"afjioaljfl;kjaklfaf;"<<std::endl;
-    //     if(hiwinlibmodbus.libModbus_Connect(command->ip_address)){
-    //       std::cout<<"----------------------------------"<<std::endl;
-    //       // hiwinlibmodbus.Holding_Registers_init();
-    //       // hiwinlibmodbus.MOTOR_EXCITE();
-    //     }
-      // }
-//     if (command->mode == "connect") {
-//       std::cout<<"afjioaljfl;kjaklfaf;"<<std::endl;
-//         hiwinlibmodbus.libModbus_Connect(command->ip_address);
-//         hiwinlibmodbus.Holding_Registers_init();
-//         hiwinlibmodbus.MOTOR_EXCITE();
-//       }
-
-//     else if (command->mode == "PTP"){
-//         hiwinlibmodbus.PTP(command->type, command->vel, command->acc, command->tool, command->base, command->angle);    
-//     }
-//     else if (command->mode == "LIN"){
-//         hiwinlibmodbus.LIN(command->type, command->vel, command->acc, command->tool, command->base, command->xyz);    
-//     }
-//     else if (command->mode == "CIRC"){
-//         hiwinlibmodbus.CIRC(command->vel, command->acc, command->tool, command->base, command->circ_s, command->circ_end);    
-//     }
-//     else if (command->mode == "DO"){
-//         hiwinlibmodbus.DO(command->digital_output, command->onoff);    
-//     }
-// /*********************
-//   value   joint 
-//   0~5 -> A1~A6 
-//   value  Cartesian
-//   6~11 -> XYZABC 
-// *********************/
-//     else if (command->mode == "JOG"){
-//         hiwinlibmodbus.JOG(command->joint, command->dir);    
-//     }
-//     else if (command->mode == "HOME"){
-//         hiwinlibmodbus.HOME();
-//     }
-//     else if (command->mode == "close"){
-//         hiwinlibmodbus.Modbus_Close();
-//     }
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
 
@@ -116,7 +75,7 @@ private:
 
   void execute(const std::shared_ptr<GoalHandleHiwinmodbus> command_handle)
   {
-    HiwinLibmodbus hiwinlibmodbus;
+    
     RCLCPP_INFO(this->get_logger(), "Executing goal");
     rclcpp::Rate loop_rate(1);
     const auto command = command_handle->get_goal();
@@ -128,26 +87,22 @@ private:
     auto result = std::make_shared<Hiwinmodbus::Result>();
 
     if (command->mode == "connect" && rclcpp::ok()) {
-      // std::cout<<"afjioaljfl;kjaklfaf;"<<std::endl;
         if(hiwinlibmodbus.libModbus_Connect(command->ip_address)&& rclcpp::ok()){
           std::cout<<"----------------------------------"<<std::endl;
           hiwinlibmodbus.Holding_Registers_init();
-          // hiwinlibmodbus.MOTOR_EXCITE();
         }
       }
-    // if (command->mode == "Hold"){
-    //     hiwinlibmodbus.Holding_Registers_init();
-    // }
+
     else if (command->mode == "PTP"){
         hiwinlibmodbus.PTP(command->type, command->vel, command->acc, command->tool, command->base, command->angle);
         std::cout<<"afjioaljfl;kjaklfaf;"<<std::endl;    
     }
-    // else if (command->mode == "LIN"){
-    //     hiwinlibmodbus.LIN(command->type, command->vel, command->acc, command->tool, command->base, command->xyz);    
-    // }
-    // else if (command->mode == "CIRC"){
-    //     hiwinlibmodbus.CIRC(command->vel, command->acc, command->tool, command->base, command->circ_s, command->circ_end);    
-    // }
+    else if (command->mode == "LIN"){
+        hiwinlibmodbus.LIN(command->type, command->vel, command->acc, command->tool, command->base, command->xyz);    
+    }
+    else if (command->mode == "CIRC"){
+        hiwinlibmodbus.CIRC(command->vel, command->acc, command->tool, command->base, command->circ_s, command->circ_end);    
+    }
     else if (command->mode == "DO"){
         hiwinlibmodbus.DO(command->digital_output, command->onoff);    
     }
