@@ -64,6 +64,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
 find_package(hiwin_action_interfaces REQUIRED)
+find_package(hiwin_interfaces REQUIRED) 
 find_package(rclcpp)
 find_package(rclcpp_action)
 find_package(rclcpp_components) 
@@ -176,12 +177,19 @@ add_executable(hiwin_libmodbus_node src/hiwin_libmodbus_node.cpp)
 #  ${PROJECT_NAME}
 #)
 
+add_executable(hiwinmodbus_server src/hiwinmodbus_server.cpp)
+ament_target_dependencies(hiwinmodbus_server
+  rclcpp hiwin_interfaces)      
+target_link_libraries(hiwinmodbus_server hiwin_libmodbus)
+
 target_include_directories(hiwin_libmodbus_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 target_link_libraries(hiwin_libmodbus_node hiwin_libmodbus)
 
-install(TARGETS hiwin_libmodbus_node
+install(TARGETS 
+  hiwinmodbus_server
+  hiwin_libmodbus_node
   DESTINATION lib/${PROJECT_NAME})
 
 ament_python_install_package(${PROJECT_NAME})
