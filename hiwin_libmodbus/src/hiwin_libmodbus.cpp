@@ -15,9 +15,11 @@ HiwinLibmodbus::~HiwinLibmodbus()
 void HiwinLibmodbus::Holding_Registers_init(){
   // TODO: the arguments should be defined, 
   // number can't be directly written here, people will confused what it is.
-  std::cout<<"999999999999999999999999999"<<std::endl;
   wrt_ = modbus_write_register(ctx_, 201, 6);
   wrt_ = modbus_write_register(ctx_, 200, 0);
+}
+
+void HiwinLibmodbus::MOTOR_EXCITE(){
     //motor excite again, makesure it works
   wrt_ = modbus_write_register(ctx_, 200, 0);
 }
@@ -113,7 +115,6 @@ void HiwinLibmodbus::HOME(){
   wrt_ = modbus_write_register(ctx_, 200, 1);
 }
 void HiwinLibmodbus::PTP(int type, int vel, int acc, int TOOL, int BASE, const std::vector<double> Angle){
-  std::cout<<"????????????????????"<<std::endl;
   const double* angle = &Angle[0];
   return PTP(type, vel, acc, TOOL, BASE, angle);
 }
@@ -121,7 +122,6 @@ void HiwinLibmodbus::PTP(int type, int vel, int acc, int TOOL, int BASE, const d
   // double Angle[6] = {joint1, joint2, joint3, joint4, joint5, joint6};
   // TODO: the arguments should be defined, 
   // number can't be directly written here, people will confused what it is.
-  std::cout<<"$$$$$$$$$$$$$$$$$$$$$"<<std::endl;
   double A_L[6] = {0};
   double A_H[6] = {0};
   double num = 0;

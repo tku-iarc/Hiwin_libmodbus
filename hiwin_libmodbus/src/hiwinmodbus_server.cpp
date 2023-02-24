@@ -17,16 +17,19 @@ HiwinLibmodbus hiwinlibmodbus;
 void hiwinmodbus_execute(const std::shared_ptr<hiwin_interfaces::srv::Hiwinmodbus::Request> request,    
           std::shared_ptr<hiwin_interfaces::srv::Hiwinmodbus::Response>     response)  
 {
-    if (request->mode == "connect" && rclcpp::ok()) {
+    if (request->mode == "Connect" && rclcpp::ok()) {
         if(hiwinlibmodbus.libModbus_Connect(request->ip_address)&& rclcpp::ok()){
           std::cout<<"----------------------------------"<<std::endl;
           hiwinlibmodbus.Holding_Registers_init();
         }
       }
 
+    else if (request->mode == "Excite"){
+        hiwinlibmodbus.Holding_Registers_init();
+        // response->arm_state =hiwinlibmodbus.Arm_State_REGISTERS();  
+    }
     else if (request->mode == "PTP"){
         hiwinlibmodbus.PTP(request->type, request->vel, request->acc, request->tool, request->base, request->angle);
-        std::cout<<"afjioaljfl;kjaklfaf;"<<std::endl;  
         response->arm_state =hiwinlibmodbus.Arm_State_REGISTERS();  
     }
     else if (request->mode == "LIN"){
@@ -55,11 +58,12 @@ void hiwinmodbus_execute(const std::shared_ptr<hiwin_interfaces::srv::Hiwinmodbu
         hiwinlibmodbus.HOME();
         response->arm_state =hiwinlibmodbus.Arm_State_REGISTERS();
     }
-    else if (request->mode == "close"){
+    else if (request->mode == "Close"){
         hiwinlibmodbus.Modbus_Close();
+        rclcpp::shutdown();
     }
                                     
-  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "execurting mode\na: %s",  request->mode);                                         
+  // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "execurting mode\na: %s",  request->mode);                                         
   RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "sending back response");
 }
 
@@ -72,7 +76,7 @@ int main(int argc, char **argv)
   rclcpp::Service<hiwin_interfaces::srv::Hiwinmodbus>::SharedPtr service =               // CHANGE
     node->create_service<hiwin_interfaces::srv::Hiwinmodbus>("hiwinmodbus_service",  &hiwinmodbus_execute);   // CHANGE
 
-  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Ready to add three ints.");                     // CHANGE
+  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Ready to recieve commands.");                     // CHANGE
 
   rclcpp::spin(node);
   rclcpp::shutdown();

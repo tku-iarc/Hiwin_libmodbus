@@ -63,8 +63,6 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
-find_package(hiwin_action_interfaces REQUIRED)
-find_package(hiwin_interfaces REQUIRED) 
 find_package(rclcpp)
 find_package(rclcpp_action)
 find_package(rclcpp_components) 
@@ -133,50 +131,15 @@ install(
   RUNTIME DESTINATION bin
 )
 
-add_library(action_server SHARED
-  src/hiwinmodbus_action_server.cpp)
+
 
 target_compile_features(${PROJECT_NAME}_ctype_wrapper
   PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
-target_include_directories(action_server PUBLIC
-  action_server PRIVATE
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-
-target_link_libraries(action_server
-  ${PROJECT_NAME}
-)
-
-#target_include_directories(action_server PRIVATE
-#  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
- # $<INSTALL_INTERFACE:include>)
-target_compile_definitions(action_server
-  PRIVATE "ACTION_TUTORIALS_CPP_BUILDING_DLL")
-ament_target_dependencies(action_server
-  "hiwin_action_interfaces"
-  "rclcpp"
-  "rclcpp_action"
-  "rclcpp_components")
-rclcpp_components_register_node(action_server PLUGIN "hiwinmodbus_action_server_cpp::HiwinmodbusActionServer" EXECUTABLE hiwinmodbus_action_server)
-install(TARGETS
-  action_server
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
-
-
 
 add_executable(hiwin_libmodbus_node src/hiwin_libmodbus_node.cpp)
-#add_executable(hiwinmodbus_action_server src/hiwinmodbus_action_server.cpp)
-#ament_target_dependencies(hiwinmodbus_action_server
-#  "rclcpp"
-# "rclcpp_action"
-#  "rclcpp_components"
-#  "hiwin_action_interfaces")
-#target_link_libraries(hiwinmodbus_action_server
-#  ${PROJECT_NAME}
-#)
 
+
+find_package(hiwin_interfaces REQUIRED) 
 add_executable(hiwinmodbus_server src/hiwinmodbus_server.cpp)
 ament_target_dependencies(hiwinmodbus_server
   rclcpp hiwin_interfaces)      

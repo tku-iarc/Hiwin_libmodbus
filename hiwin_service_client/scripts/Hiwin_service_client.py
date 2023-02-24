@@ -32,12 +32,12 @@ class HiwinmodbusClient(Node):
     
     def call_Connect(self):
 
-        self.command_req.mode  ='connect'
+        self.command_req.mode  ='Connect'
         return self.send_command_callback()    
 
-    def call_Holding_Registers_init(self):
+    def call_MOTOR_EXCITE(self):
 
-        self.command_req.mode  ='Hold'
+        self.command_req.mode  ='Excite'
         return self.send_command_callback() 
 
     def call_PTP(self, type, vel, acc, tool, base, angle):
@@ -98,42 +98,35 @@ class HiwinmodbusClient(Node):
 
     def call_Modbus_Close(self):
 
-        self.command_req.mode  ='close'
+        self.command_req.mode  ='Close'
         print("Modbus Close") 
         return self.send_command_callback()
 
 def main(args=None):
     PTP_Angle = [0.00, 0.00, 0.00, 0.00, -90.00, 0.00]                 # ANGLE
     PTP_Angle2 = [20.00, 0.00, 0.00, 0.00, -90.00, 0.00]  
+    PTP_Angle3 = [-20.00, 0.00, 0.00, 0.00, -90.00, 0.00]
     rclpy.init(args=args)
 
     hiwinmodbus_client = HiwinmodbusClient()
 
     
     hiwinmodbus_client.call_Connect()
-    input()
-    # action_client.call_Holding_Registers_init()
     # input()
-    # action_client.call_HOME()
+    hiwinmodbus_client.call_MOTOR_EXCITE()
     # input()
     hiwinmodbus_client.call_PTP(0,200,10,1,0,PTP_Angle)
-    input()
+    # input()
     hiwinmodbus_client.call_PTP(0,200,10,1,0,PTP_Angle2)
-    input()
+    hiwinmodbus_client.call_PTP(0,200,10,1,0,PTP_Angle3)
+    hiwinmodbus_client.call_PTP(0,200,10,1,0,PTP_Angle)
+    # input()
+    hiwinmodbus_client.call_HOME()
     hiwinmodbus_client.call_Modbus_Close()
 
 
     hiwinmodbus_client.destroy_node()
     rclpy.shutdown()
-
-
-    
-    # rclpy.spin(action_client)
-    
-
-    # future = action_client.call_HOME()
-
-    # rclpy.spin_until_future_complete(action_client, future)
 
 if __name__ == "__main__":
     main()

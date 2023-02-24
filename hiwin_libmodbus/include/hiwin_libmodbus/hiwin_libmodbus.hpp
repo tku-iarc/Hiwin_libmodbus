@@ -41,6 +41,8 @@ public:
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void Holding_Registers_init();
   HIWIN_LIBMODBUS_PUBLIC_TYPE
+  void MOTOR_EXCITE();
+  HIWIN_LIBMODBUS_PUBLIC_TYPE
   int libModbus_Connect(const std::string& ip_address);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   int libModbus_Connect(const wchar_t *ip_address);
