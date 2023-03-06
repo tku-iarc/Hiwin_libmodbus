@@ -17,14 +17,15 @@ HiwinLibmodbus hiwinlibmodbus;
 void hiwinmodbus_execute(const std::shared_ptr<hiwin_interfaces::srv::Hiwinmodbus::Request> request,    
           std::shared_ptr<hiwin_interfaces::srv::Hiwinmodbus::Response>     response)  
 {
-    if (request->mode == "Connect" && rclcpp::ok()) {
-        if(hiwinlibmodbus.libModbus_Connect(request->ip_address)&& rclcpp::ok()){
-          std::cout<<"----------------------------------"<<std::endl;
-          hiwinlibmodbus.Holding_Registers_init();
-        }
-      }
 
-    else if (request->mode == "Excite"){
+    // if (request->mode == "Connect" && rclcpp::ok()) {
+    //     if(hiwinlibmodbus.libModbus_Connect(request->ip_address)&& rclcpp::ok()){
+    //       std::cout<<"----------------------------------"<<std::endl;
+    //       hiwinlibmodbus.Holding_Registers_init();
+    //     }
+    //   }
+
+    if (request->mode == "Excite"){
         hiwinlibmodbus.Holding_Registers_init();
         // response->arm_state =hiwinlibmodbus.Arm_State_REGISTERS();  
     }
@@ -70,7 +71,9 @@ void hiwinmodbus_execute(const std::shared_ptr<hiwin_interfaces::srv::Hiwinmodbu
 int main(int argc, char **argv)
 {
   rclcpp::init(argc, argv);
-
+  
+  hiwinlibmodbus.libModbus_Connect("192.168.0.1");
+  hiwinlibmodbus.Holding_Registers_init();
   std::shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared("hiwinmodbus_service");   // CHANGE
 
   rclcpp::Service<hiwin_interfaces::srv::Hiwinmodbus>::SharedPtr service =               // CHANGE
@@ -79,5 +82,5 @@ int main(int argc, char **argv)
   RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Ready to recieve commands.");                     // CHANGE
 
   rclcpp::spin(node);
-  rclcpp::shutdown();
+  // rclcpp::shutdown();
 }

@@ -30,10 +30,10 @@ class HiwinmodbusClient(Node):
         rclpy.spin_until_future_complete(self, self.future)
         return self.future.result()
     
-    def call_Connect(self):
+    # def call_Connect(self):
 
-        self.command_req.mode  ='Connect'
-        return self.send_command_callback()    
+    #     self.command_req.mode  ='Connect'
+    #     return self.send_command_callback()    
 
     def call_MOTOR_EXCITE(self):
 
@@ -111,7 +111,7 @@ def main(args=None):
     hiwinmodbus_client = HiwinmodbusClient()
 
     
-    hiwinmodbus_client.call_Connect()
+    # hiwinmodbus_client.call_Connect()
     # input()
     hiwinmodbus_client.call_MOTOR_EXCITE()
     # input()
