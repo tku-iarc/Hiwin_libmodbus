@@ -116,6 +116,7 @@ void HiwinLibmodbus::HOME(){
 }
 void HiwinLibmodbus::PTP(int type, int vel, int acc, int TOOL, int BASE, const std::vector<double> Angle){
   const double* angle = &Angle[0];
+  std::cout<< &angle <<std::endl;
   return PTP(type, vel, acc, TOOL, BASE, angle);
 }
 void HiwinLibmodbus::PTP(int type, int vel, int acc, int TOOL, int BASE, const double *Angle){

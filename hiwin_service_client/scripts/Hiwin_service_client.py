@@ -25,7 +25,6 @@ class HiwinmodbusClient(Node):
         self.command_req = Hiwinmodbus.Request()
 
     def send_command_callback(self):
-        self.command_req.ip_address = '192.168.0.1'
         self.future = self.cli.call_async(self.command_req)
         rclpy.spin_until_future_complete(self, self.future)
         return self.future.result()
@@ -35,12 +34,17 @@ class HiwinmodbusClient(Node):
     #     self.command_req.mode  ='Connect'
     #     return self.send_command_callback()    
 
+    def check_arm_state(self):
+
+        self.command_req.mode  ='check'
+        return self.send_command_callback() 
+
     def call_MOTOR_EXCITE(self):
 
         self.command_req.mode  ='Excite'
         return self.send_command_callback() 
 
-    def call_PTP(self, type, vel, acc, tool, base, angle):
+    def call_PTP(self, type, vel, acc, tool, base, ptp_pose):
 
         self.command_req.mode  ='PTP'
         self.command_req.type  = type 
@@ -48,10 +52,10 @@ class HiwinmodbusClient(Node):
         self.command_req.acc   = acc
         self.command_req.tool  = tool
         self.command_req.base  = base
-        self.command_req.angle = angle
+        self.command_req.ptp_pose = ptp_pose
         return self.send_command_callback()
 
-    def call_LIN(self, type, vel, acc, tool, base, xyz):
+    def call_LIN(self, type, vel, acc, tool, base, lin_pose):
 
         self.command_req.mode  ='LIN'
         self.command_req.type = type 
@@ -59,7 +63,7 @@ class HiwinmodbusClient(Node):
         self.command_req.acc  = acc
         self.command_req.tool = tool
         self.command_req.base = base
-        self.command_req.xyz  = xyz
+        self.command_req.lin_pose  = lin_pose
         return self.send_command_callback()
 
 
@@ -77,6 +81,7 @@ class HiwinmodbusClient(Node):
 
     def call_DO(self, digital_output, onoff):
 
+        #Digital_output[DO_Num, 0or1]
         self.command_req.mode  ='DO'
         self.command_req.digital_output = digital_output
         self.command_req.onoff          = onoff
@@ -116,11 +121,14 @@ def main(args=None):
     hiwinmodbus_client.call_MOTOR_EXCITE()
     # input()
     hiwinmodbus_client.call_PTP(0,200,10,1,0,PTP_Angle)
+    hiwinmodbus_client.check_arm_state()
+    
     # input()
     hiwinmodbus_client.call_PTP(0,200,10,1,0,PTP_Angle2)
     hiwinmodbus_client.call_PTP(0,200,10,1,0,PTP_Angle3)
     hiwinmodbus_client.call_PTP(0,200,10,1,0,PTP_Angle)
-    # input()
+    hiwinmodbus_client.check_arm_state()
+    # # input()
     hiwinmodbus_client.call_HOME()
     hiwinmodbus_client.call_Modbus_Close()
 

@@ -1,4 +1,3 @@
-string ip_address
 string mode
 int32 type
 int32 vel 
@@ -8,8 +7,8 @@ int32 base
 int32 digital_output 
 int32 onoff
 #Digital_output[DO_Num, 0or1]
-float64[] angle
-float64[] xyz
+float64[] ptp_pose
+float64[] lin_pose
 float64[] circ_s
 float64[] circ_end
 int32 joint
