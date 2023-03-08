@@ -121,15 +121,17 @@ def main(args=None):
     hiwinmodbus_client.call_MOTOR_EXCITE()
     # input()
     hiwinmodbus_client.call_PTP(0,200,10,1,0,PTP_Angle)
-    hiwinmodbus_client.check_arm_state()
-    
-    # input()
     hiwinmodbus_client.call_PTP(0,200,10,1,0,PTP_Angle2)
+    hiwinmodbus_client.check_arm_state()
+    # hiwinmodbus_client.check_arm_state()
+    
+    # # input()
+    # hiwinmodbus_client.call_PTP(0,200,10,1,0,PTP_Angle2)
     hiwinmodbus_client.call_PTP(0,200,10,1,0,PTP_Angle3)
     hiwinmodbus_client.call_PTP(0,200,10,1,0,PTP_Angle)
     hiwinmodbus_client.check_arm_state()
-    # # input()
-    hiwinmodbus_client.call_HOME()
+    # # # input()
+    # hiwinmodbus_client.call_HOME()
     hiwinmodbus_client.call_Modbus_Close()
 
 
