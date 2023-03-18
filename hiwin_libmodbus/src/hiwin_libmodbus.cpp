@@ -63,16 +63,16 @@ void HiwinLibmodbus::Modbus_Close(){
   modbus_close(ctx_);
 }
 
-int HiwinLibmodbus::Arm_State_REGISTERS(){
+uint16_t* HiwinLibmodbus::Arm_State_REGISTERS(){
   uint16_t regs[MAX_READ_REGISTERS] = {0};
   ret_ = modbus_read_input_registers(ctx_, ROBOT_MOVE_STATE, MOVE_STATE_LEN, regs);
-  return ret_;
+  return regs;
 }
 
-int HiwinLibmodbus::Read_REGISTERS(int addr){
+uint16_t* HiwinLibmodbus::Read_REGISTERS(int addr){
   uint16_t regs[MAX_READ_REGISTERS] = {0};
   ret_ = modbus_read_input_registers(ctx_, addr, MOVE_STATE_LEN, regs);
-  return ret_;
+  return regs;
 }
 
 /************* Discret_e Input *************/
@@ -116,7 +116,6 @@ void HiwinLibmodbus::HOME(){
 }
 void HiwinLibmodbus::PTP(int type, int vel, int acc, int TOOL, int BASE, const std::vector<double> Angle){
   const double* angle = &Angle[0];
-  // std::cout<< *angle <<std::endl;
   return PTP(type, vel, acc, TOOL, BASE, angle);
 }
 void HiwinLibmodbus::PTP(int type, int vel, int acc, int TOOL, int BASE, const double *Angle){

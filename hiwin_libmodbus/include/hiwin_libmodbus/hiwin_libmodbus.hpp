@@ -51,9 +51,9 @@ public:
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void Modbus_Close();
   HIWIN_LIBMODBUS_PUBLIC_TYPE
-  int Arm_State_REGISTERS();
+  uint16_t* Arm_State_REGISTERS();
   HIWIN_LIBMODBUS_PUBLIC_TYPE
-  int Read_REGISTERS(int addr);
+  uint16_t* Read_REGISTERS(int addr);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void DO(int DO_Num, int x);
   HIWIN_LIBMODBUS_PUBLIC_TYPE

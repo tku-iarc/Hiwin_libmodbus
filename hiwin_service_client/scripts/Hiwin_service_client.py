@@ -18,7 +18,7 @@ from hiwin_interfaces.srv import Hiwinmodbus
 class HiwinmodbusClient(Node):
 
     def __init__(self):
-        super().__init__('hiwinmodbus_service')
+        super().__init__('hiwinmodbus_client')
         self.cli = self.create_client(Hiwinmodbus, 'hiwinmodbus_service')
         while not self.cli.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('service not available, waiting again...')
@@ -29,51 +29,39 @@ class HiwinmodbusClient(Node):
         rclpy.spin_until_future_complete(self, self.future)
         return self.future.result()
     
-    # def call_Connect(self):
+    def Holding_command(self, holding):
 
-    #     self.command_req.mode  ='Connect'
-    #     return self.send_command_callback()    
-
-    def check_arm_state(self):
-
-        self.command_req.mode  ='check'
-        return self.send_command_callback() 
+        self.command_req.holding = holding
 
     def call_MOTOR_EXCITE(self):
 
         self.command_req.mode  ='Excite'
         return self.send_command_callback() 
 
-    def call_PTP(self, type, vel, acc, tool, base, ptp_pose):
+    def call_PTP(self, type, vel, acc, pose):
 
         self.command_req.mode  ='PTP'
         self.command_req.type  = type 
         self.command_req.vel   = vel
         self.command_req.acc   = acc
-        self.command_req.tool  = tool
-        self.command_req.base  = base
-        self.command_req.ptp_pose = ptp_pose
+        self.command_req.pose = pose
         return self.send_command_callback()
 
-    def call_LIN(self, type, vel, acc, tool, base, lin_pose):
+    def call_LIN(self, type, vel, acc, pose):
 
         self.command_req.mode  ='LIN'
         self.command_req.type = type 
         self.command_req.vel  = vel
         self.command_req.acc  = acc
-        self.command_req.tool = tool
-        self.command_req.base = base
-        self.command_req.lin_pose  = lin_pose
+        self.command_req.pose  = pose
         return self.send_command_callback()
 
 
-    def call_CIRC(self, vel, acc, tool, base, circ_s, circ_end):
+    def call_CIRC(self, vel, acc, circ_s, circ_end):
 
         self.command_req.mode  ='CIRC'
         self.command_req.vel      = vel
         self.command_req.acc      = acc
-        self.command_req.tool     = tool
-        self.command_req.base     = base
         self.command_req.circ_s   = circ_s
         self.command_req.circ_end = circ_end
         return self.send_command_callback()
@@ -81,7 +69,6 @@ class HiwinmodbusClient(Node):
 
     def call_DO(self, digital_output, onoff):
 
-        #Digital_output[DO_Num, 0or1]
         self.command_req.mode  ='DO'
         self.command_req.digital_output = digital_output
         self.command_req.onoff          = onoff
@@ -115,23 +102,19 @@ def main(args=None):
 
     hiwinmodbus_client = HiwinmodbusClient()
 
-    
-    # hiwinmodbus_client.call_Connect()
-    # input()
+    hiwinmodbus_client.Holding_command(False)
     hiwinmodbus_client.call_MOTOR_EXCITE()
-    # input()
-    hiwinmodbus_client.call_PTP(0,200,10,1,0,PTP_Angle)
-    hiwinmodbus_client.call_PTP(0,200,10,1,0,PTP_Angle2)
-    hiwinmodbus_client.check_arm_state()
-    # hiwinmodbus_client.check_arm_state()
     
-    # # input()
-    # hiwinmodbus_client.call_PTP(0,200,10,1,0,PTP_Angle2)
-    hiwinmodbus_client.call_PTP(0,200,10,1,0,PTP_Angle3)
-    hiwinmodbus_client.call_PTP(0,200,10,1,0,PTP_Angle)
-    hiwinmodbus_client.check_arm_state()
-    # # # input()
-    # hiwinmodbus_client.call_HOME()
+    # input()
+    hiwinmodbus_client.Holding_command(False)
+    hiwinmodbus_client.call_PTP(0,200,10,PTP_Angle)
+    # input()
+    hiwinmodbus_client.Holding_command(True)
+    hiwinmodbus_client.call_PTP(0,200,10,PTP_Angle2)
+    # hiwinmodbus_client.call_PTP(0,200,10,1,0,PTP_Angle3)
+    # hiwinmodbus_client.call_PTP(0,200,10,1,0,PTP_Angle)
+    input()
+    hiwinmodbus_client.call_HOME()
     hiwinmodbus_client.call_Modbus_Close()
 
 

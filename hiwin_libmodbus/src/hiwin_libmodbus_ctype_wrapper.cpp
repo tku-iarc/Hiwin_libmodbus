@@ -26,11 +26,11 @@ void Modbus_Close(HiwinLibmodbus* ptr){
   ptr->Modbus_Close();
 }
 
-int Arm_State_REGISTERS(HiwinLibmodbus* ptr){
+uint16_t* Arm_State_REGISTERS(HiwinLibmodbus* ptr){
   return ptr->Arm_State_REGISTERS();
 }
 
-int Read_REGISTERS(HiwinLibmodbus* ptr, int addr){
+uint16_t* Read_REGISTERS(HiwinLibmodbus* ptr, int addr){
   return ptr->Read_REGISTERS(addr);
 }
 void DO(HiwinLibmodbus* ptr, int DO_Num, int x){
