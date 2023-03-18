@@ -69,10 +69,9 @@ class HiwinmodbusServiceServer : public rclcpp::Node
 
             if (request->holding == true){
                 while(1){
-                    uint16_t* uint_ptr = hiwinlibmodbus.Arm_State_REGISTERS(); // pointer to a uint16_t array
-                    int* int_ptr = reinterpret_cast<int*>(uint_ptr);
-                    int arm_state= int_ptr[0];
-                    std::cout<<arm_state<<std::endl;
+                    std::cout<<"----------------------------------"<<std::endl;
+                    hiwinlibmodbus.Arm_State_REGISTERS(); // return arm_state
+                    int arm_state = hiwinlibmodbus.Check_Arm_State();
                     if (arm_state == 1){
                         response->arm_state = arm_state;
                         break;
@@ -80,8 +79,6 @@ class HiwinmodbusServiceServer : public rclcpp::Node
 
                 }
             }
-
-          // RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "execurting mode\na: %s",  request->mode);                                         
           RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "sending back response");
         }
 };

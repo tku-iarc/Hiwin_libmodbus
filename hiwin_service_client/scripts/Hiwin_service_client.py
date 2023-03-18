@@ -29,63 +29,70 @@ class HiwinmodbusClient(Node):
         rclpy.spin_until_future_complete(self, self.future)
         return self.future.result()
     
-    def Holding_command(self, holding):
+    # def Holding_command(self, holding):
 
-        self.command_req.holding = holding
+    #     self.command_req.holding = holding
 
-    def call_MOTOR_EXCITE(self):
+    def call_MOTOR_EXCITE(self, holding=False):
 
         self.command_req.mode  ='Excite'
+        self.command_req.holding = holding
         return self.send_command_callback() 
 
-    def call_PTP(self, type, vel, acc, pose):
-
+    def call_PTP(self, type, vel, acc, pose, holding=False):
+        
         self.command_req.mode  ='PTP'
         self.command_req.type  = type 
         self.command_req.vel   = vel
         self.command_req.acc   = acc
         self.command_req.pose = pose
+        self.command_req.holding = holding
         return self.send_command_callback()
 
-    def call_LIN(self, type, vel, acc, pose):
+    def call_LIN(self, type, vel, acc, pose, holding=False):
 
         self.command_req.mode  ='LIN'
         self.command_req.type = type 
         self.command_req.vel  = vel
         self.command_req.acc  = acc
         self.command_req.pose  = pose
+        self.command_req.holding = holding
         return self.send_command_callback()
 
 
-    def call_CIRC(self, vel, acc, circ_s, circ_end):
+    def call_CIRC(self, vel, acc, circ_s, circ_end, holding=False):
 
         self.command_req.mode  ='CIRC'
         self.command_req.vel      = vel
         self.command_req.acc      = acc
         self.command_req.circ_s   = circ_s
         self.command_req.circ_end = circ_end
+        self.command_req.holding = holding
         return self.send_command_callback()
 
 
-    def call_DO(self, digital_output, onoff):
+    def call_DO(self, digital_output, onoff, holding=False):
 
         self.command_req.mode  ='DO'
         self.command_req.digital_output = digital_output
         self.command_req.onoff          = onoff
+        self.command_req.holding = holding
         return self.send_command_callback()
 
 
-    def call_HOME(self):
+    def call_HOME(self, holding=False):
         self.command_req.mode  ='HOME'
         self.command_req.type = 0
+        self.command_req.holding = holding
         return self.send_command_callback()
 
 
-    def call_JOG(self, joint, dir):
+    def call_JOG(self, joint, dir, holding=False):
 
         self.command_req.mode  ='JOG'
         self.command_req.joint = joint
         self.command_req.dir   = dir
+        self.command_req.holding = holding
         return self.send_command_callback()
 
     def call_Modbus_Close(self):
@@ -102,19 +109,16 @@ def main(args=None):
 
     hiwinmodbus_client = HiwinmodbusClient()
 
-    hiwinmodbus_client.Holding_command(False)
     hiwinmodbus_client.call_MOTOR_EXCITE()
     
-    # input()
-    hiwinmodbus_client.Holding_command(False)
     hiwinmodbus_client.call_PTP(0,200,10,PTP_Angle)
-    # input()
-    hiwinmodbus_client.Holding_command(True)
-    hiwinmodbus_client.call_PTP(0,200,10,PTP_Angle2)
-    # hiwinmodbus_client.call_PTP(0,200,10,1,0,PTP_Angle3)
-    # hiwinmodbus_client.call_PTP(0,200,10,1,0,PTP_Angle)
-    input()
-    hiwinmodbus_client.call_HOME()
+    hiwinmodbus_client.call_PTP(0,200,10,PTP_Angle3)
+    hiwinmodbus_client.call_PTP(0,200,10,PTP_Angle)
+    hiwinmodbus_client.call_PTP(0,200,10,PTP_Angle2, holding= True)
+
+    hiwinmodbus_client.call_PTP(0,200,10,PTP_Angle3)
+    hiwinmodbus_client.call_PTP(0,200,10,PTP_Angle, holding= True)
+    # hiwinmodbus_client.call_HOME()
     hiwinmodbus_client.call_Modbus_Close()
 
 

@@ -53,6 +53,10 @@ public:
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   uint16_t* Arm_State_REGISTERS();
   HIWIN_LIBMODBUS_PUBLIC_TYPE
+  void Arm_State_Return(int int_val);
+  HIWIN_LIBMODBUS_PUBLIC_TYPE
+  int Check_Arm_State();
+  HIWIN_LIBMODBUS_PUBLIC_TYPE
   uint16_t* Read_REGISTERS(int addr);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void DO(int DO_Num, int x);
@@ -81,6 +85,7 @@ public:
     int joint,int dir);
 
   int qqq{0};
+  int ArmState;
 
 private:
   modbus_t        *ctx_{nullptr};
