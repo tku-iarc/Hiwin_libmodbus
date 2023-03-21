@@ -44,9 +44,11 @@ class ExampleStrategy(Node):
 
     def _state_machine(self, state: States) -> States:
         if state == States.INIT:
+            self.get_logger().info('INIT')
             nest_state = States.MOVE_TO_PHOTO_POSE
 
         elif state == States.MOVE_TO_PHOTO_POSE:
+            self.get_logger().info('MOVE_TO_PHOTO_POSE')
             pose = Twist()
             [pose.linear.x, pose.linear.y, pose.linear.z] = PHOTO_POSE[0:3]
             [pose.angular.x, pose.angular.y, pose.angular.z] = PHOTO_POSE[3:6]
@@ -58,6 +60,7 @@ class ExampleStrategy(Node):
                 nest_state = None
 
         elif state == States.YOLO_DETECT:
+            self.get_logger().info('YOLO_DETECT')
             res = self.call_yolo()
             # OBJECT_POSE here for example, should get obj pose according to yolo result
             if res.has_object:
@@ -67,6 +70,7 @@ class ExampleStrategy(Node):
                 nest_state = States.CLOSE_ROBOT
 
         elif state == States.MOVE_TO_OPJECT_TOP:
+            self.get_logger().info('MOVE_TO_OPJECT_TOP')
             pose = Twist()
             [pose.linear.x, pose.linear.y, pose.linear.z] = self.object_pose[0:3]
             [pose.angular.x, pose.angular.y, pose.angular.z] = self.object_pose[3:6]
@@ -79,6 +83,7 @@ class ExampleStrategy(Node):
                 nest_state = None
 
         elif state == States.PICK_OBJECT:
+            self.get_logger().info('PICK_OBJECT')
             pose = Twist()
             [pose.linear.x, pose.linear.y, pose.linear.z] = self.object_pose[0:3]
             [pose.angular.x, pose.angular.y, pose.angular.z] = self.object_pose[3:6]
@@ -113,6 +118,7 @@ class ExampleStrategy(Node):
                 nest_state = None
 
         elif state == States.MOVE_TO_PLACE_POSE:
+            self.get_logger().info('MOVE_TO_PLACE_POSE')
             pose = Twist()
             [pose.linear.x, pose.linear.y, pose.linear.z] = PLACE_POSE[0:3]
             [pose.angular.x, pose.angular.y, pose.angular.z] = PLACE_POSE[3:6]
@@ -124,6 +130,7 @@ class ExampleStrategy(Node):
                 nest_state = None
 
         elif state == States.CLOSE_ROBOT:
+            self.get_logger().info('CLOSE_ROBOT')
             req = self.generate_robot_request(cmd_mode=RobotCommand.Request.CLOSE)
             res = self.call_hiwin(req)
             nest_state = States.FINISH
@@ -135,10 +142,8 @@ class ExampleStrategy(Node):
 
     def _main_loop(self):
         state = States.INIT
-        while state in States.__members__:
+        while state != States.FINISH:
             state = self._state_machine(state)
-            if state == States.FINISH:
-                break
         self.destroy_node()
 
     def _wait_for_future_done(self, future: Future, timeout=-1):
