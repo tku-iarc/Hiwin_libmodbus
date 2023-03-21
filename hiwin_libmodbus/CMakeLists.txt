@@ -63,9 +63,10 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
-find_package(rclcpp)
-find_package(rclcpp_action)
-find_package(rclcpp_components) 
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(rclcpp_components REQUIRED)
+find_package(hiwin_interfaces REQUIRED)
 
 
 # uncomment the following section in order to fill in
@@ -139,7 +140,6 @@ target_compile_features(${PROJECT_NAME}_ctype_wrapper
 add_executable(hiwin_libmodbus_node src/hiwin_libmodbus_node.cpp)
 
 
-find_package(hiwin_interfaces REQUIRED) 
 add_executable(hiwinmodbus_server src/hiwinmodbus_server.cpp)
 ament_target_dependencies(hiwinmodbus_server
   rclcpp hiwin_interfaces)      

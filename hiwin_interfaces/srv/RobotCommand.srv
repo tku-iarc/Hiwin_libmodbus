@@ -1,0 +1,51 @@
+# request
+
+# mode
+uint8 EXCITE=1
+uint8 PTP=2
+uint8 LINE=3
+uint8 CIRC=4
+uint8 DIGITAL_OUTPUT=5
+uint8 HOME=6
+uint8 JOG=7
+uint8 CLOSE=8
+
+# cmd type
+uint8 POSE_CMD=11
+uint8 JOINTS_CMD=12
+
+# digital_output_cmd
+uint8 DIGITAL_ON=13
+uint8 DIGITAL_OFF=14
+
+
+bool holding
+uint8 cmd_mode
+uint8 cmd_type
+uint8 velocity
+uint8 acceleration
+
+
+uint8 digital_output_pin
+uint8 digital_output_cmd
+
+# for POSE_CMD
+geometry_msgs/Twist pose
+
+# for JOINTS_CMD
+float64[6] joints
+float64[] circ_s
+float64[] circ_end
+
+# for JOG mode
+int8 jog_joint
+int8 jog_dir
+
+---
+
+uint8 IDLE=1
+uint8 RUNNING=2
+uint8 HOLD=3
+uint8 DELAY=4
+
+uint8 arm_state
