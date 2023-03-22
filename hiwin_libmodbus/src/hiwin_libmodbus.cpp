@@ -63,21 +63,13 @@ void HiwinLibmodbus::Modbus_Close(){
   modbus_close(ctx_);
 }
 
-uint16_t* HiwinLibmodbus::Arm_State_REGISTERS(){
+
+void HiwinLibmodbus::Arm_State_REGISTERS(int &arm_state){
   uint16_t regs[MAX_READ_REGISTERS] = {0};
   ret_ = modbus_read_input_registers(ctx_, ROBOT_MOVE_STATE, MOVE_STATE_LEN, regs);
-  int int_val = static_cast<int>(regs[0]); // convert uint_val to int_val
-  Arm_State_Return(int_val);
-  // return regs;
+  arm_state = static_cast<int>(regs[0]); // convert uint_val to int_val
 }
 
-void HiwinLibmodbus::Arm_State_Return(int int_val){
-  ArmState = int_val;
-}
-
-int HiwinLibmodbus::Check_Arm_State(){
-  return ArmState;
-}
 
 uint16_t* HiwinLibmodbus::Read_REGISTERS(int addr){
   uint16_t regs[MAX_READ_REGISTERS] = {0};
