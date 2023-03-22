@@ -145,6 +145,11 @@ ament_target_dependencies(hiwinmodbus_server
   rclcpp hiwin_interfaces)      
 target_link_libraries(hiwinmodbus_server hiwin_libmodbus)
 
+add_executable(hiwinlibmodbus_server src/hiwinlibmodbus_server.cpp)
+ament_target_dependencies(hiwinlibmodbus_server
+  rclcpp hiwin_interfaces)      
+target_link_libraries(hiwinlibmodbus_server hiwin_libmodbus)
+
 target_include_directories(hiwin_libmodbus_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
@@ -152,6 +157,7 @@ target_link_libraries(hiwin_libmodbus_node hiwin_libmodbus)
 
 install(TARGETS 
   hiwinmodbus_server
+  hiwinlibmodbus_server
   hiwin_libmodbus_node
   DESTINATION lib/${PROJECT_NAME})
 
