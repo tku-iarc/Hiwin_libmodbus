@@ -30,6 +30,7 @@ class HiwinmodbusServiceServer : public rclcpp::Node
                 
         int tool = 1;
         int base = 0;
+        int arm_state;
         rclcpp::Service<hiwin_interfaces::srv::Hiwinmodbus>::SharedPtr server_;
         void hiwinmodbus_execute(const std::shared_ptr<hiwin_interfaces::srv::Hiwinmodbus::Request> request,    
                   std::shared_ptr<hiwin_interfaces::srv::Hiwinmodbus::Response>     response)  
@@ -70,8 +71,8 @@ class HiwinmodbusServiceServer : public rclcpp::Node
             if (request->holding == true){
                 while(1){
                     std::cout<<"----------------------------------"<<std::endl;
-                    hiwinlibmodbus.Arm_State_REGISTERS(); // return arm_state
-                    int arm_state = hiwinlibmodbus.Check_Arm_State();
+                    hiwinlibmodbus.Arm_State_REGISTERS(arm_state); // return arm_state
+                    // int arm_state = hiwinlibmodbus.Check_Arm_State();
                     if (arm_state == 1){
                         response->arm_state = arm_state;
                         break;
@@ -79,6 +80,7 @@ class HiwinmodbusServiceServer : public rclcpp::Node
 
                 }
             }
+
           RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "sending back response");
         }
 };
