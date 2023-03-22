@@ -16,7 +16,8 @@ DEFAULT_ACCELERATION = 10
 VACUUM_PIN = 3
 
 PHOTO_POSE = [0.00, 0.00, 0.00, 0.00, -90.00, 0.00]
-OBJECT_POSE = [20.00, 0.00, 0.00, 0.00, -90.00, 0.00]
+# OBJECT_POSE = [20.00, 0.00, 0.00, 0.00, -90.00, 0.00]
+OBJECT_POSE = [-67.517, 361.753, 293.500, 180.00, 0.00, 100.572]
 PLACE_POSE = [-20.00, 0.00, 0.00, 0.00, -90.00, 0.00]
 
 # only for example as we don't use yolo here
@@ -52,9 +53,11 @@ class ExampleStrategy(Node):
             pose = Twist()
             [pose.linear.x, pose.linear.y, pose.linear.z] = PHOTO_POSE[0:3]
             [pose.angular.x, pose.angular.y, pose.angular.z] = PHOTO_POSE[3:6]
-            req = self.generate_robot_request(pose=pose)
+            req = self.generate_robot_request(
+                cmd_type=RobotCommand.Request.JOINTS_CMD,
+                pose=pose)
             res = self.call_hiwin(req)
-            if res == RobotCommand.Response.IDLE:
+            if res.arm_state == RobotCommand.Response.IDLE:
                 nest_state = States.YOLO_DETECT
             else:
                 nest_state = None
@@ -72,12 +75,16 @@ class ExampleStrategy(Node):
         elif state == States.MOVE_TO_OPJECT_TOP:
             self.get_logger().info('MOVE_TO_OPJECT_TOP')
             pose = Twist()
-            [pose.linear.x, pose.linear.y, pose.linear.z] = self.object_pose[0:3]
-            [pose.angular.x, pose.angular.y, pose.angular.z] = self.object_pose[3:6]
-            pose.linear.z += 10
-            req = self.generate_robot_request(pose=pose)
+            # [pose.linear.x, pose.linear.y, pose.linear.z] = self.object_pose[0:3]
+            # [pose.angular.x, pose.angular.y, pose.angular.z] = self.object_pose[3:6]
+            [pose.linear.x, pose.linear.y, pose.linear.z] = OBJECT_POSE[0:3]
+            [pose.angular.x, pose.angular.y, pose.angular.z] = OBJECT_POSE[3:6]
+            # pose.linear.z += 10
+            req = self.generate_robot_request(
+                cmd_mode=RobotCommand.Request.LINE,
+                pose=pose)
             res = self.call_hiwin(req)
-            if res == RobotCommand.Response.IDLE:
+            if res.arm_state == RobotCommand.Response.IDLE:
                 nest_state = States.PICK_OBJECT
             else:
                 nest_state = None
@@ -85,17 +92,19 @@ class ExampleStrategy(Node):
         elif state == States.PICK_OBJECT:
             self.get_logger().info('PICK_OBJECT')
             pose = Twist()
-            [pose.linear.x, pose.linear.y, pose.linear.z] = self.object_pose[0:3]
-            [pose.angular.x, pose.angular.y, pose.angular.z] = self.object_pose[3:6]
-
+            # [pose.linear.x, pose.linear.y, pose.linear.z] = self.object_pose[0:3]
+            # [pose.angular.x, pose.angular.y, pose.angular.z] = self.object_pose[3:6]
+            [pose.linear.x, pose.linear.y, pose.linear.z] = OBJECT_POSE[0:3]
+            [pose.angular.x, pose.angular.y, pose.angular.z] = OBJECT_POSE[3:6]
             req = self.generate_robot_request(
-                cmd_mode=RobotCommand.Request.LINE,
+                cmd_mode=RobotCommand.Request.PTP,
                 holding=False,
                 velocity=5,
                 pose=pose
             )
             res = self.call_hiwin(req)
-
+            
+            print(res)
             req = self.generate_robot_request(
                 cmd_mode=RobotCommand.Request.DIGITAL_OUTPUT,
                 digital_output_cmd=RobotCommand.Request.DIGITAL_ON,
@@ -107,12 +116,12 @@ class ExampleStrategy(Node):
 
             pose.linear.z += 10
             req = self.generate_robot_request(
-                cmd_mode=RobotCommand.Request.LINE,
+                cmd_mode=RobotCommand.Request.PTP,
                 pose=pose
             )
             res = self.call_hiwin(req)
-
-            if res == RobotCommand.Response.IDLE:
+            
+            if res.arm_state == RobotCommand.Response.IDLE:
                 nest_state = States.MOVE_TO_PLACE_POSE
             else:
                 nest_state = None
@@ -122,10 +131,25 @@ class ExampleStrategy(Node):
             pose = Twist()
             [pose.linear.x, pose.linear.y, pose.linear.z] = PLACE_POSE[0:3]
             [pose.angular.x, pose.angular.y, pose.angular.z] = PLACE_POSE[3:6]
-            req = self.generate_robot_request(pose=pose)
+            req = self.generate_robot_request(
+                cmd_type=RobotCommand.Request.JOINTS_CMD,
+                pose=pose)
             res = self.call_hiwin(req)
-            if res == RobotCommand.Response.IDLE:
-                nest_state = States.YOLO_DETECT
+
+            req = self.generate_robot_request(
+                cmd_mode=RobotCommand.Request.DIGITAL_OUTPUT,
+                digital_output_cmd=RobotCommand.Request.DIGITAL_OFF,
+                digital_output_pin=VACUUM_PIN,
+                holding=True,
+                pose=pose
+            )
+            res = self.call_hiwin(req)
+            req = self.generate_robot_request(
+                cmd_mode=RobotCommand.Request.WAITING
+            )
+            res = self.call_hiwin(req)
+            if res.arm_state == RobotCommand.Response.IDLE:
+                nest_state = States.MOVE_TO_PHOTO_POSE
             else:
                 nest_state = None
 
@@ -138,12 +162,15 @@ class ExampleStrategy(Node):
         else:
             nest_state = None
             self.get_logger().error('Input state not supported!')
+            # return
         return nest_state
 
     def _main_loop(self):
         state = States.INIT
         while state != States.FINISH:
             state = self._state_machine(state)
+            if state == None:
+                break
         self.destroy_node()
 
     def _wait_for_future_done(self, future: Future, timeout=-1):
@@ -188,7 +215,7 @@ class ExampleStrategy(Node):
         return request
 
     def call_hiwin(self, req):
-        while not self.hiwin_client.wait_for_service(timeout_sec=1.0):
+        while not self.hiwin_client.wait_for_service(timeout_sec=2.0):
             self.get_logger().info('service not available, waiting again...')
         future = self.hiwin_client.call_async(req)
         if self._wait_for_future_done(future):
@@ -201,9 +228,11 @@ class ExampleStrategy(Node):
         class YoloResponse(NamedTuple):
             has_object: bool
             object_pose: list
-        res = YoloResponse()
-        res.has_object = True if self.object_cnt < 5 else False
-        res.object_pose = OBJECT_POSE
+        has_object = True if self.object_cnt < 5 else False
+        object_pose = OBJECT_POSE
+        res = YoloResponse(has_object,object_pose)
+        # res.has_object = True if self.object_cnt < 5 else False
+        # res.object_pose = OBJECT_POSE
         self.object_cnt += 1
         return res
 
