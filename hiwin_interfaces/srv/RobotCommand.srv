@@ -9,14 +9,15 @@ uint8 DIGITAL_OUTPUT=5
 uint8 HOME=6
 uint8 JOG=7
 uint8 CLOSE=8
+uint8 WAITING=9
 
 # cmd type
-uint8 POSE_CMD=11
-uint8 JOINTS_CMD=12
+uint8 JOINTS_CMD=0
+uint8 POSE_CMD=1
 
 # digital_output_cmd
-uint8 DIGITAL_ON=13
-uint8 DIGITAL_OFF=14
+uint8 DIGITAL_ON=1
+uint8 DIGITAL_OFF=0
 
 
 bool holding
