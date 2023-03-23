@@ -51,11 +51,10 @@ class ExampleStrategy(Node):
         elif state == States.MOVE_TO_PHOTO_POSE:
             self.get_logger().info('MOVE_TO_PHOTO_POSE')
             pose = Twist()
-            [pose.linear.x, pose.linear.y, pose.linear.z] = PHOTO_POSE[0:3]
-            [pose.angular.x, pose.angular.y, pose.angular.z] = PHOTO_POSE[3:6]
             req = self.generate_robot_request(
                 cmd_type=RobotCommand.Request.JOINTS_CMD,
-                pose=pose)
+                joints=PHOTO_POSE
+                )
             res = self.call_hiwin(req)
             if res.arm_state == RobotCommand.Response.IDLE:
                 nest_state = States.YOLO_DETECT
@@ -75,13 +74,11 @@ class ExampleStrategy(Node):
         elif state == States.MOVE_TO_OPJECT_TOP:
             self.get_logger().info('MOVE_TO_OPJECT_TOP')
             pose = Twist()
-            # [pose.linear.x, pose.linear.y, pose.linear.z] = self.object_pose[0:3]
-            # [pose.angular.x, pose.angular.y, pose.angular.z] = self.object_pose[3:6]
-            [pose.linear.x, pose.linear.y, pose.linear.z] = OBJECT_POSE[0:3]
-            [pose.angular.x, pose.angular.y, pose.angular.z] = OBJECT_POSE[3:6]
+            [pose.linear.x, pose.linear.y, pose.linear.z] = self.object_pose[0:3]
+            [pose.angular.x, pose.angular.y, pose.angular.z] = self.object_pose[3:6]
             # pose.linear.z += 10
             req = self.generate_robot_request(
-                cmd_mode=RobotCommand.Request.LINE,
+                cmd_mode=RobotCommand.Request.PTP,
                 pose=pose)
             res = self.call_hiwin(req)
             if res.arm_state == RobotCommand.Response.IDLE:
@@ -92,10 +89,8 @@ class ExampleStrategy(Node):
         elif state == States.PICK_OBJECT:
             self.get_logger().info('PICK_OBJECT')
             pose = Twist()
-            # [pose.linear.x, pose.linear.y, pose.linear.z] = self.object_pose[0:3]
-            # [pose.angular.x, pose.angular.y, pose.angular.z] = self.object_pose[3:6]
-            [pose.linear.x, pose.linear.y, pose.linear.z] = OBJECT_POSE[0:3]
-            [pose.angular.x, pose.angular.y, pose.angular.z] = OBJECT_POSE[3:6]
+            [pose.linear.x, pose.linear.y, pose.linear.z] = self.object_pose[0:3]
+            [pose.angular.x, pose.angular.y, pose.angular.z] = self.object_pose[3:6]
             req = self.generate_robot_request(
                 cmd_mode=RobotCommand.Request.PTP,
                 holding=False,
@@ -114,7 +109,7 @@ class ExampleStrategy(Node):
             )
             res = self.call_hiwin(req)
 
-            pose.linear.z += 10
+            pose.linear.z -= 30
             req = self.generate_robot_request(
                 cmd_mode=RobotCommand.Request.PTP,
                 pose=pose
@@ -129,10 +124,9 @@ class ExampleStrategy(Node):
         elif state == States.MOVE_TO_PLACE_POSE:
             self.get_logger().info('MOVE_TO_PLACE_POSE')
             pose = Twist()
-            [pose.linear.x, pose.linear.y, pose.linear.z] = PLACE_POSE[0:3]
-            [pose.angular.x, pose.angular.y, pose.angular.z] = PLACE_POSE[3:6]
             req = self.generate_robot_request(
                 cmd_type=RobotCommand.Request.JOINTS_CMD,
+                joints=PLACE_POSE,
                 pose=pose)
             res = self.call_hiwin(req)
 

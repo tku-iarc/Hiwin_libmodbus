@@ -45,26 +45,25 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
             }
             else if (request->cmd_mode == 2){
                 if(request->cmd_type==0){
-                    command={request->pose.linear.x, request->pose.linear.y, request->pose.linear.z,
-                     request->pose.angular.x, request->pose.angular.y, request->pose.angular.z};
-                }
-                else if(request->cmd_type==1){
                     command = {request->joints[0], request->joints[1], request->joints[2],
                     request->joints[3], request->joints[4], request->joints[5]};
+                }
+                else if(request->cmd_type==1){
+                    command={request->pose.linear.x, request->pose.linear.y, request->pose.linear.z,
+                    request->pose.angular.x, request->pose.angular.y, request->pose.angular.z};
                 }
 
                 hiwinlibmodbus.PTP(request->cmd_type, request->velocity, request->acceleration, tool, base, command);
             }
             else if (request->cmd_mode == 3){
                 if(request->cmd_type==0){
-                    command={request->pose.linear.x, request->pose.linear.y, request->pose.linear.z,
-                     request->pose.angular.x, request->pose.angular.y, request->pose.angular.z};
-                }
-                else if(request->cmd_type==1){
                     command = {request->joints[0], request->joints[1], request->joints[2],
                     request->joints[3], request->joints[4], request->joints[5]};
                 }
-                hiwinlibmodbus.LIN(request->cmd_type, request->velocity, request->acceleration, tool, base, command);
+                else if(request->cmd_type==1){
+                    command={request->pose.linear.x, request->pose.linear.y, request->pose.linear.z,
+                    request->pose.angular.x, request->pose.angular.y, request->pose.angular.z};
+                }                hiwinlibmodbus.LIN(request->cmd_type, request->velocity, request->acceleration, tool, base, command);
             }
             else if (request->cmd_mode == 4){
                 hiwinlibmodbus.CIRC(request->velocity, request->acceleration, tool, base, request->circ_s, request->circ_end); 
