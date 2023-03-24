@@ -30,9 +30,9 @@ void Modbus_Close(HiwinLibmodbus* ptr){
 //   // return ptr->Arm_State_REGISTERS();
 // }
 
-uint16_t* Read_REGISTERS(HiwinLibmodbus* ptr, int addr){
-  return ptr->Read_REGISTERS(addr);
-}
+// uint16_t* Read_REGISTERS(HiwinLibmodbus* ptr, int addr){
+//   return ptr->Read_REGISTERS(addr);
+// }
 void DO(HiwinLibmodbus* ptr, int DO_Num, int x){
   ptr->DO(DO_Num, x);
 }
