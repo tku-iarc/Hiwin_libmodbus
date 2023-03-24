@@ -53,32 +53,32 @@ public:
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void Arm_State_REGISTERS(int &arm_state);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
-  uint16_t* Read_REGISTERS(int addr);
+  void Read_REGISTERS(int addr, int &state);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
-  void DO(int DO_Num, int x);
+  void DO(int DO_Num, int active);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void HOME();
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void PTP(
-    int type, int vel, int acc, int TOOL, int BASE, const std::vector<double> Angle);
+    uint16_t type, uint16_t vel, uint16_t acc, uint16_t TOOL, uint16_t BASE, const std::vector<double> GOAL);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void PTP(
-    int type, int vel, int acc, int TOOL, int BASE, const double *Angle);
+    uint16_t type, uint16_t vel, uint16_t acc, uint16_t TOOL, uint16_t BASE, const double *GOAL);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void LIN(
-    int type, int vel, int acc, int TOOL, int BASE, std::vector<double> XYZ);
+    uint16_t type, uint16_t vel, uint16_t acc, uint16_t TOOL, uint16_t BASE, const std::vector<double> GOAL);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void LIN(
-    int type, int vel, int acc, int TOOL, int BASE, const double *XYZ);
+    uint16_t type, uint16_t vel, uint16_t acc, uint16_t TOOL, uint16_t BASE, const double *GOAL);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void CIRC(
-    int vel, int acc, int TOOL, int BASE, std::vector<double> CIRC_s, std::vector<double> CIRC_end);
+    uint16_t vel, uint16_t acc, uint16_t TOOL, uint16_t BASE, const std::vector<double> CIRC_s, const std::vector<double> CIRC_end);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void CIRC(
-    int vel, int acc, int TOOL, int BASE, const double *CIRC_s, const double *CIRC_end);
+    uint16_t vel, uint16_t acc, uint16_t TOOL, uint16_t BASE, const double *CIRC_s, const double *CIRC_end);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void JOG(
-    int joint,int dir);
+    uint16_t joint,uint16_t dir);
 
   int qqq{0};
   // int ArmState;

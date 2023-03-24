@@ -110,7 +110,7 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
                 rclcpp::shutdown();
             }
             else if (request->cmd_mode == 9){
-                request->holding == true;
+                request->holding = true;
             }
             if (request->holding == true){
                 while(1){

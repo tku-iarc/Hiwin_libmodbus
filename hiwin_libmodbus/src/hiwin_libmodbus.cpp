@@ -71,10 +71,10 @@ void HiwinLibmodbus::Arm_State_REGISTERS(int &arm_state){
 }
 
 
-uint16_t* HiwinLibmodbus::Read_REGISTERS(int addr){
+void HiwinLibmodbus::Read_REGISTERS(int addr, int &state){
   uint16_t regs[MAX_READ_REGISTERS] = {0};
   ret_ = modbus_read_input_registers(ctx_, addr, MOVE_STATE_LEN, regs);
-  return regs;
+  state = static_cast<int>(regs[0]); // convert uint_val to int_val
 }
 
 /************* Discret_e Input *************/
@@ -98,8 +98,8 @@ uint16_t* HiwinLibmodbus::Read_REGISTERS(int addr){
   value:300 ~ 555 -> DO[1] ~ [256]
     0 or 65280  -> R/W 
   **********************************/
-void HiwinLibmodbus::DO(int DO_Num, int x){
-  wrt_ = modbus_write_bit(ctx_, DO_Num, x);
+void HiwinLibmodbus::DO(int DO_Num, int active){
+  wrt_ = modbus_write_bit(ctx_, DO_Num, active);
   // TODO: the arguments should be defined, 
   // number can't be directly written here, people will confused what it is.
   wrt_ = modbus_write_register(ctx_, 200, 1);
@@ -107,47 +107,45 @@ void HiwinLibmodbus::DO(int DO_Num, int x){
 
 /*************  Holding Register  *************/
 void HiwinLibmodbus::HOME(){  
-  int state = 0;
-  int arm_state = 0;
   // TODO: the arguments should be defined, 
   // number can't be directly written here, people will confused what it is.
   uint16_t home_run[2] = {4, 1};
-  uint16_t home_stop[2] = {4, 0};
+  // uint16_t home_stop[2] = {4, 0};
   wrt_ = modbus_write_registers(ctx_, REGISTERS_ADDRESS, 2, home_run);
   wrt_ = modbus_write_register(ctx_, 200, 1);
 }
-void HiwinLibmodbus::PTP(int type, int vel, int acc, int TOOL, int BASE, const std::vector<double> Angle){
-  const double* angle = &Angle[0];
-  return PTP(type, vel, acc, TOOL, BASE, angle);
+void HiwinLibmodbus::PTP(uint16_t type, uint16_t vel, uint16_t acc, uint16_t TOOL, uint16_t BASE, const std::vector<double> GOAL){
+  const double* goal = &GOAL[0];
+  return PTP(type, vel, acc, TOOL, BASE, goal);
 }
-void HiwinLibmodbus::PTP(int type, int vel, int acc, int TOOL, int BASE, const double *Angle){
+void HiwinLibmodbus::PTP(uint16_t type, uint16_t vel, uint16_t acc, uint16_t TOOL, uint16_t BASE, const double *GOAL){
   // double Angle[6] = {joint1, joint2, joint3, joint4, joint5, joint6};
   // TODO: the arguments should be defined, 
   // number can't be directly written here, people will confused what it is.
-  double A_L[6] = {0};
-  double A_H[6] = {0};
+  uint16_t A_L[6] = {0};
+  uint16_t A_H[6] = {0};
   double num = 0;
 
   for (int i = 0; i < 6; i++)
   {
-    num = Angle[i] - (int)Angle[i];
-    if (Angle[i] >= 0)
+    num = GOAL[i] - (int)GOAL[i];
+    if (GOAL[i] >= 0)
     {
       // angle > 0 ex. 90
-      A_L[i] = ((int)Angle[i]*1000)%65536;
+      A_L[i] = ((int)GOAL[i]*1000)%65536;
       A_L[i] = A_L[i] + (num*1000);
       if (A_L[i] > 32767)
       {
-        A_L[i] = (((int)Angle[i]*1000)%65536)-65536;
+        A_L[i] = (((int)GOAL[i]*1000)%65536)-65536;
         A_L[i] = A_L[i] + (num*1000);
       }
-      A_H[i] = (Angle[i]*1000)/65536;
+      A_H[i] = (GOAL[i]*1000)/65536;
     }else
     {
       // angle < 0 ex.-90
-      A_L[i] = (((int)Angle[i]*1000)%65536)+65536;
+      A_L[i] = (((int)GOAL[i]*1000)%65536)+65536;
       A_L[i] = A_L[i] + (num*1000);
-      A_H[i] = ((Angle[i]*1000)/65536)-1;
+      A_H[i] = ((GOAL[i]*1000)/65536)-1;
     }
   }
   
@@ -163,38 +161,38 @@ void HiwinLibmodbus::PTP(int type, int vel, int acc, int TOOL, int BASE, const d
   wrt_ = modbus_write_register(ctx_, 200, 1);
 }
 
-void HiwinLibmodbus::LIN(int type, int vel, int acc, int TOOL, int BASE, std::vector<double> XYZ){
-  
-  return LIN(type, vel, acc, TOOL, BASE, XYZ);
+void HiwinLibmodbus::LIN(uint16_t type, uint16_t vel, uint16_t acc, uint16_t TOOL, uint16_t BASE, const std::vector<double> GOAL){
+  const double* goal = &GOAL[0];
+  return LIN(type, vel, acc, TOOL, BASE, goal);
 }
-void HiwinLibmodbus::LIN(int type, int vel, int acc, int TOOL, int BASE, const double *XYZ){
+void HiwinLibmodbus::LIN(uint16_t type, uint16_t vel, uint16_t acc, uint16_t TOOL, uint16_t BASE, const double *GOAL){
   // double Angle[6] = {x, y, z, a, b, c};
   // TODO: the arguments should be defined, 
   // number can't be directly written here, people will confused what it is.
-  double A_L[6] = {0};
-  double A_H[6] = {0};
+  uint16_t A_L[6] = {0};
+  uint16_t A_H[6] = {0};
   double num = 0;
 
   for (int i = 0; i < 6; i++)
   {
-    num = XYZ[i] - (int)XYZ[i];
-    if (XYZ[i] >= 0)
+    num = GOAL[i] - (int)GOAL[i];
+    if (GOAL[i] >= 0)
     {
       // angle > 0 ex. 90
-      A_L[i] = ((int)XYZ[i]*1000)%65536;
+      A_L[i] = ((int)GOAL[i]*1000)%65536;
       A_L[i] = A_L[i] + (num*1000);
       if (A_L[i] > 32767)
       {
-        A_L[i] = (((int)XYZ[i]*1000)%65536)-65536;
+        A_L[i] = (((int)GOAL[i]*1000)%65536)-65536;
         A_L[i] = A_L[i] + (num*1000);
       }
-      A_H[i] = (XYZ[i]*1000)/65536;
+      A_H[i] = (GOAL[i]*1000)/65536;
     }else
     {
       // angle < 0 ex.-90
-      A_L[i] = (((int)XYZ[i]*1000)%65536)+65536;
+      A_L[i] = (((int)GOAL[i]*1000)%65536)+65536;
       A_L[i] = A_L[i] + (num*1000);
-      A_H[i] = ((XYZ[i]*1000)/65536)-1;
+      A_H[i] = ((GOAL[i]*1000)/65536)-1;
     }
   }
 
@@ -211,16 +209,18 @@ void HiwinLibmodbus::LIN(int type, int vel, int acc, int TOOL, int BASE, const d
 }
 
 
-void HiwinLibmodbus::CIRC(int vel, int acc, int TOOL, int BASE, std::vector<double> CIRC_s, std::vector<double> CIRC_end){
-  return CIRC(vel, acc, TOOL, BASE, CIRC_s, CIRC_end);
+void HiwinLibmodbus::CIRC(uint16_t vel, uint16_t acc, uint16_t TOOL, uint16_t BASE, const std::vector<double> CIRC_s, const std::vector<double> CIRC_end){
+  const double* circ_s = &CIRC_s[0];
+  const double* circ_end = &CIRC_end[0];
+  return CIRC(vel, acc, TOOL, BASE, circ_s, circ_end);
 }
-void HiwinLibmodbus::CIRC(int vel, int acc, int TOOL, int BASE, const double *CIRC_s, const double *CIRC_end){
+void HiwinLibmodbus::CIRC(uint16_t vel, uint16_t acc, uint16_t TOOL, uint16_t BASE, const double *CIRC_s, const double *CIRC_end){
   // TODO: the arguments should be defined, 
   // number can't be directly written here, people will confused what it is.
-  double start_L[6] = {0};
-  double start_H[6] = {0};
-  double end_L[6] = {0};
-  double end_H[6] = {0};
+  uint16_t start_L[6] = {0};
+  uint16_t start_H[6] = {0};
+  uint16_t end_L[6] = {0};
+  uint16_t end_H[6] = {0};
   double num1 = 0;
   double num2 = 0;
 
@@ -280,7 +280,7 @@ void HiwinLibmodbus::CIRC(int vel, int acc, int TOOL, int BASE, const double *CI
   value  Cartesian
   6~11 -> XYZABC 
 *********************/
-void HiwinLibmodbus::JOG(int joint,int dir){
+void HiwinLibmodbus::JOG(uint16_t joint,uint16_t dir){
   // TODO: the arguments should be defined, 
   // number can't be directly written here, people will confused what it is.
   uint16_t table[3] = {3, joint, dir};
