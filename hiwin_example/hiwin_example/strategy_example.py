@@ -92,7 +92,7 @@ class ExampleStrategy(Node):
             [pose.linear.x, pose.linear.y, pose.linear.z] = self.object_pose[0:3]
             [pose.angular.x, pose.angular.y, pose.angular.z] = self.object_pose[3:6]
             req = self.generate_robot_request(
-                cmd_mode=RobotCommand.Request.PTP,
+                cmd_mode=RobotCommand.Request.LINE,
                 holding=False,
                 velocity=5,
                 pose=pose
@@ -111,7 +111,7 @@ class ExampleStrategy(Node):
 
             pose.linear.z -= 30
             req = self.generate_robot_request(
-                cmd_mode=RobotCommand.Request.PTP,
+                cmd_mode=RobotCommand.Request.LINE,
                 pose=pose
             )
             res = self.call_hiwin(req)
