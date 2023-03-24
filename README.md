@@ -38,8 +38,8 @@ source install/setup.bash
 
 ## Run Test Script
 Note:In order to connect to real Hiwin Robot, please change your **Network** setting after plugin LAN.
-Select **Wired->setting->IPv4**, choose **Manual** change **Netmasks** to parameter `255.255.255.0`, 
-change **Address** to parameter `192.168.0.x`, except parameter `192.168.0.1`, which is default robot ip address.
+Select **Wired->setting->IPv4**, choose **Manual** change **Netmasks** to `255.255.255.0`, 
+change **Address** to `192.168.0.x`, except `192.168.0.1`, which is default robot ip address.
 
 ```bash
 
