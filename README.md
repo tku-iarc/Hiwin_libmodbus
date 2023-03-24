@@ -23,11 +23,6 @@ cd ~<your_workspace>/src
 # clone this repository with libmodus
 git clone --recurse-submodules https://github.com/tku-iarc/Hiwin_libmodbus.git
 
-# install libmodbus
-cd ~<your_workspace>/src/Hiwin_libmodbus/libmodbus
-./autogen.sh
-./configure && sudo make install
-
 # build the workspace
 cd ~<your_workspace>
 colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
