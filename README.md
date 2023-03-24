@@ -5,7 +5,7 @@ This Modbus Library include libmodbus and ROS2 package, which let controlling Hi
 The submodule package is from [libmodus](https://github.com/stephane/libmodbus.git).
 
 ## Requirements 
-This package requires a system setup with ROS2. It is recommended to use **Ubuntu 22.04 with ROS Humble**.
+This package requires a system setup with ROS2. It is recommended to use **Ubuntu 22.04 with ROS2 Humble**.
 
 <!-- camera SDK and ROS package is needed. Here we use [Linux Distribution](https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linux.md#installing-the-packages) and [Realsense-ros](https://github.com/IntelRealSense/realsense-ros/tree/ros1-legacy) -->
 
