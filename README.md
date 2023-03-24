@@ -42,5 +42,5 @@ change **Address** to `192.168.0.x`, except `192.168.0.1`, which is default robo
 ros2 run hiwin_libmodbus hiwinlibmodbus_server
 
 # run example strategy
-python3 /src/Hiwin_libmodbus/hiwin_example/hiwin_example/strategy_example.py
+python3 src/Hiwin_libmodbus/hiwin_example/hiwin_example/strategy_example.py
 ```
