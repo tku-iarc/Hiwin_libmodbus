@@ -9,9 +9,10 @@ from typing import NamedTuple
 from geometry_msgs.msg import Twist
 
 from hiwin_interfaces.srv import RobotCommand
+from hiwin_service_client.scripts import YoloDetector
 
-DEFAULT_VELOCITY = 10
-DEFAULT_ACCELERATION = 10
+DEFAULT_VELOCITY = 20
+DEFAULT_ACCELERATION = 20
 
 VACUUM_PIN = 3
 
@@ -92,7 +93,7 @@ class ExampleStrategy(Node):
             [pose.linear.x, pose.linear.y, pose.linear.z] = self.object_pose[0:3]
             [pose.angular.x, pose.angular.y, pose.angular.z] = self.object_pose[3:6]
             req = self.generate_robot_request(
-                cmd_mode=RobotCommand.Request.PTP,
+                cmd_mode=RobotCommand.Request.LINE,
                 holding=False,
                 velocity=5,
                 pose=pose
@@ -111,7 +112,7 @@ class ExampleStrategy(Node):
 
             pose.linear.z -= 30
             req = self.generate_robot_request(
-                cmd_mode=RobotCommand.Request.PTP,
+                cmd_mode=RobotCommand.Request.LINE,
                 pose=pose
             )
             res = self.call_hiwin(req)
