@@ -9,7 +9,7 @@ from typing import NamedTuple
 from geometry_msgs.msg import Twist
 
 from hiwin_interfaces.srv import RobotCommand
-from hiwin_service_client.scripts import YoloDetector
+from YoloDetector import YoloDetectorActionClient
 
 DEFAULT_VELOCITY = 20
 DEFAULT_ACCELERATION = 20

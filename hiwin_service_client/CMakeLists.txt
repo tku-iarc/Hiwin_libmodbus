@@ -11,6 +11,7 @@ find_package(hiwin_libmodbus REQUIRED)
 find_package(hiwin_interfaces REQUIRED)
 find_package(rclpy REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(ament_cmake_python REQUIRED)
 
 
 if(BUILD_TESTING)
@@ -25,4 +26,16 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+# ament_export_dependencies(rclpy)
+
+# ament_export_python_exports(${PROJECT_NAME}
+#   DIRECTORY ${PROJECT_SOURCE_DIR}/scripts
+#   MODULE_NAME YoloDetector)
+
+
+# ament_python_install_package(${PROJECT_NAME})
+# install(PROGRAMS
+#   scripts/YoloDetector.py
+#   DESTINATION lib/${PROJECT_NAME}
+# )
 ament_package()
