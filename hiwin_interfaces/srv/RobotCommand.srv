@@ -8,8 +8,11 @@ uint8 CIRC=4
 uint8 DIGITAL_OUTPUT=5
 uint8 HOME=6
 uint8 JOG=7
-uint8 CLOSE=8
-uint8 WAITING=9
+uint8 CHECK_JOINT=8
+uint8 CHECK_POSE=9
+uint8 CLOSE=10
+uint8 WAITING=11
+
 
 # cmd type
 uint8 JOINTS_CMD=0
@@ -50,3 +53,4 @@ uint8 HOLD=3
 uint8 DELAY=4
 
 uint8 arm_state
+float64[] current_position

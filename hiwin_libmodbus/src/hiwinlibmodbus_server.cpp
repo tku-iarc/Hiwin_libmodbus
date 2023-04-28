@@ -30,6 +30,7 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
         int tool = 1;
         int base = 0;
         int arm_state;
+        std::vector<double> current_pos;
         std::vector<double> command;
         int command_type;
         int digital_output;
@@ -99,17 +100,25 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
           value  Cartesian
           6~11 -> XYZABC 
         *********************/
-            else if (request->cmd_mode == 7){
-                hiwinlibmodbus.JOG(request->jog_joint, request->jog_dir); 
-            }
             else if (request->cmd_mode == 6){
                 hiwinlibmodbus.HOME();
             }
+            else if (request->cmd_mode == 7){
+                hiwinlibmodbus.JOG(request->jog_joint, request->jog_dir); 
+            }
             else if (request->cmd_mode == 8){
+                hiwinlibmodbus.getArmJoints(current_pos); 
+                response->current_position = current_pos;
+            }
+            else if (request->cmd_mode == 9){
+                hiwinlibmodbus.getArmPose(current_pos); 
+                response->current_position = current_pos;
+            }
+            else if (request->cmd_mode == 10){
                 hiwinlibmodbus.Modbus_Close();
                 rclcpp::shutdown();
             }
-            else if (request->cmd_mode == 9){
+            else if (request->cmd_mode == 11){
                 request->holding = true;
             }
             if (request->holding == true){

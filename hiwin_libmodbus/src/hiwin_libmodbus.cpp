@@ -114,6 +114,44 @@ void HiwinLibmodbus::HOME(){
   wrt_ = modbus_write_registers(ctx_, REGISTERS_ADDRESS, 2, home_run);
   wrt_ = modbus_write_register(ctx_, 200, 1);
 }
+
+
+void HiwinLibmodbus::getArmJoints(std::vector<double> &Joints){
+    uint16_t regs[MAX_READ_REGISTERS] = {0};
+    modbus_read_input_registers(ctx_, ROBOT_MOVE_STATE, MOVE_STATE_LEN, regs);
+    double joint1 = static_cast<double>(regs[0])*65.536; 
+    double joint2 = static_cast<double>(regs[0])*65.536; 
+    double joint3 = static_cast<double>(regs[0])*65.536; 
+    double joint4 = static_cast<double>(regs[0])*65.536; 
+    double joint5 = static_cast<double>(regs[0])*65.536; 
+    double joint6 = static_cast<double>(regs[0])*65.536; 
+    Joints.push_back(joint1);
+    Joints.push_back(joint2);
+    Joints.push_back(joint3);
+    Joints.push_back(joint4);
+    Joints.push_back(joint5);
+    Joints.push_back(joint6);
+
+}
+
+void HiwinLibmodbus::getArmPose(std::vector<double> &Pose){
+    uint16_t regs[MAX_READ_REGISTERS] = {0};
+    modbus_read_input_registers(ctx_, ROBOT_MOVE_STATE, MOVE_STATE_LEN, regs);
+    double posex = static_cast<double>(regs[0])*65.536; 
+    double posey = static_cast<double>(regs[0])*65.536; 
+    double posez = static_cast<double>(regs[0])*65.536; 
+    double rx    = static_cast<double>(regs[0])*65.536; 
+    double ry    = static_cast<double>(regs[0])*65.536; 
+    double rz    = static_cast<double>(regs[0])*65.536; 
+    Pose.push_back(posex);
+    Pose.push_back(posey);
+    Pose.push_back(posez);
+    Pose.push_back(rx);
+    Pose.push_back(ry);
+    Pose.push_back(rz);
+
+}
+
 void HiwinLibmodbus::PTP(uint16_t type, uint16_t vel, uint16_t acc, uint16_t TOOL, uint16_t BASE, const std::vector<double> GOAL){
   const double* goal = &GOAL[0];
   return PTP(type, vel, acc, TOOL, BASE, goal);

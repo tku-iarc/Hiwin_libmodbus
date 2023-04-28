@@ -59,6 +59,10 @@ public:
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void HOME();
   HIWIN_LIBMODBUS_PUBLIC_TYPE
+  void getArmJoints(std::vector<double> &Joints);
+  HIWIN_LIBMODBUS_PUBLIC_TYPE
+  void getArmPose(std::vector<double> &Pose);
+  HIWIN_LIBMODBUS_PUBLIC_TYPE
   void PTP(
     uint16_t type, uint16_t vel, uint16_t acc, uint16_t TOOL, uint16_t BASE, const std::vector<double> GOAL);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
@@ -87,6 +91,18 @@ private:
   modbus_t        *ctx_{nullptr};
   int             wrt_{0};
   int             ret_{0};
+  // int             joint1_{0};
+  // int             joint2_{0};
+  // int             joint3_{0};
+  // int             joint4_{0};
+  // int             joint5_{0};
+  // int             joint6_{0};
+  // int             xpose_{0};
+  // int             ypose_{0};
+  // int             zpose_{0};
+  // int             rxpose_{0};
+  // int             rypose_{0};
+  // int             rzpose_{0};
 };
 
 // }  // namespace hiwin_libmodbus
