@@ -24,7 +24,8 @@ class YoloDetectorActionClient(Node):
 
         self._action_client.wait_for_server()
 
-        self._send_goal_future = self._action_client.send_goal_async(goal_msg, feedback_callback=self.feedback_callback)
+        # self._send_goal_future = self._action_client.send_goal_async(goal_msg, feedback_callback=self.feedback_callback)
+        self._send_goal_future = self._action_client.send_goal_async(goal_msg)
 
         self._send_goal_future.add_done_callback(self.goal_response_callback)
 
@@ -45,7 +46,6 @@ class YoloDetectorActionClient(Node):
         # self.get_logger().info('Result: {0}'.format(result.bounding_boxes.bounding_boxes))
         for i in range(0,len(result.bounding_boxes.bounding_boxes)):
             self.objectinfo.append(result.bounding_boxes.bounding_boxes[i])
-        print(self.objectinfo)
         self.get_object_info()
         # rclpy.shutdown()
 
@@ -66,7 +66,15 @@ class YoloDetectorActionClient(Node):
         for i in range(0,len(self.xmin)):
             self.center_x.append((self.xmax[i]-self.xmin[i])/2+self.xmin[i])
             self.center_y.append((self.ymax[i]-self.ymin[i])/2+self.ymin[i])
-        # print(self.class_id, self.probability, self.center_x, self.center_y)                  
+        print("class_id")
+        print(self.class_id)
+        print("probability")
+        print(self.probability)
+        print("center_x")
+        print(self.center_x)
+        print("center_y")
+        print(self.center_y)
+        rclpy.shutdown()
         return self.class_id, self.probability, self.center_x, self.center_y
 
 def main(args=None):
@@ -74,12 +82,20 @@ def main(args=None):
 
     action_client = YoloDetectorActionClient()
     action_client.send_goal()
-    # while 1:
-    #     action_client.send_goal()
 
 
     rclpy.spin(action_client)
 
+    print("+++++++++++===========++++++++++++++++")
+    print("class_id")
+    print(action_client.class_id)
+    print("probability")
+    print(action_client.probability)
+    print("center_x")
+    print(action_client.center_x)
+    print("center_y")
+    print(action_client.center_y)
 
+    
 if __name__ == '__main__':
     main()
