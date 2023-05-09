@@ -18,8 +18,10 @@ class YoloDetectorActionClient(Node):
         self.center_x = []
         self.center_y = []
         self.probability = []
+        self.receive_data = False
 
     def send_goal(self):
+        self.receive_data = False
         goal_msg = CheckForObjects.Goal()
 
         self._action_client.wait_for_server()
@@ -66,15 +68,15 @@ class YoloDetectorActionClient(Node):
         for i in range(0,len(self.xmin)):
             self.center_x.append((self.xmax[i]-self.xmin[i])/2+self.xmin[i])
             self.center_y.append((self.ymax[i]-self.ymin[i])/2+self.ymin[i])
-        print("class_id")
-        print(self.class_id)
-        print("probability")
-        print(self.probability)
-        print("center_x")
-        print(self.center_x)
-        print("center_y")
-        print(self.center_y)
-        rclpy.shutdown()
+        # print("class_id")
+        # print(self.class_id)
+        # print("probability")
+        # print(self.probability)
+        # print("center_x")
+        # print(self.center_x)
+        # print("center_y")
+        # print(self.center_y)
+        self.receive_data = True
         return self.class_id, self.probability, self.center_x, self.center_y
 
 def main(args=None):
@@ -83,9 +85,8 @@ def main(args=None):
     action_client = YoloDetectorActionClient()
     action_client.send_goal()
 
-
-    rclpy.spin(action_client)
-
+    while rclpy.ok() and not action_client.receive_data:
+        rclpy.spin_once(action_client)
     print("+++++++++++===========++++++++++++++++")
     print("class_id")
     print(action_client.class_id)
