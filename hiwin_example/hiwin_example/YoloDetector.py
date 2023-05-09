@@ -80,6 +80,7 @@ class YoloDetectorActionClient(Node):
         return self.class_id, self.probability, self.center_x, self.center_y
 
 def main(args=None):
+    
     rclpy.init(args=args)
 
     action_client = YoloDetectorActionClient()
