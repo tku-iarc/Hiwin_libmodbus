@@ -4,12 +4,11 @@ from rclpy.node import Node
 
 from darknet_ros_msgs.action import CheckForObjects
 
-class YoloDetectorActionClient():
+class YoloDetectorActionClient(Node):
 
-    def __init__(self,node):
-        super().__init__()
-        self._node = node
-        self._action_client = ActionClient(self._node, CheckForObjects, 'checkForObjectsActionName')
+    def __init__(self):
+        super().__init__('yolodetector_action_client')
+        self._action_client = ActionClient(self, CheckForObjects, 'checkForObjectsActionName')
         self.objectinfo = []
         self.class_id = []
         self.xmin = []
@@ -28,9 +27,9 @@ class YoloDetectorActionClient():
         self._action_client.wait_for_server()
 
         # self._send_goal_future = self._action_client.send_goal_async(goal_msg, feedback_callback=self.feedback_callback)
-        self._node._send_goal_future = self._action_client.send_goal_async(goal_msg)
+        self._send_goal_future = self._action_client.send_goal_async(goal_msg)
 
-        self._node._send_goal_future.add_done_callback(self.goal_response_callback)
+        self._send_goal_future.add_done_callback(self.goal_response_callback)
 
     def goal_response_callback(self, future):
         goal_handle = future.result()
@@ -38,26 +37,27 @@ class YoloDetectorActionClient():
             self.get_logger().info('Goal rejected :(')
             return
 
-        self._node.get_logger().info('Goal accepted :)')
+        self.get_logger().info('Goal accepted :)')
 
-        self._node._get_result_future = goal_handle.get_result_async()
-        self._node._get_result_future.add_done_callback(self.get_result_callback)
+        self._get_result_future = goal_handle.get_result_async()
+        self._get_result_future.add_done_callback(self.get_result_callback)
 
     def get_result_callback(self, future):
         result = future.result().result
-        # print(result.bounding_boxes.bounding_boxes)
+        print(result.bounding_boxes.bounding_boxes)
         # self.get_logger().info('Result: {0}'.format(result.bounding_boxes.bounding_boxes))
         for i in range(0,len(result.bounding_boxes.bounding_boxes)):
             self.objectinfo.append(result.bounding_boxes.bounding_boxes[i])
         self.get_object_info()
+        # rclpy.shutdown()
 
     def feedback_callback(self, feedback_msg):
         feedback = feedback_msg.feedback
-        self._node.get_logger().info('Received feedback: {0}'.format(feedback))
+        self.get_logger().info('Received feedback: {0}'.format(feedback))
 
 
     def get_object_info(self):
-        # print(len(self.objectinfo))
+        print(len(self.objectinfo))
         for i in range(0,len(self.objectinfo)):
             self.class_id.append(self.objectinfo[i].class_id)
             self.xmin.append(self.objectinfo[i].xmin)
@@ -81,14 +81,12 @@ class YoloDetectorActionClient():
 
 def main(args=None):
     rclpy.init(args=args)
-    node = rclpy.create_node('YoloDetector')
 
-    action_client = YoloDetectorActionClient(node)
+    action_client = YoloDetectorActionClient()
     action_client.send_goal()
 
     while rclpy.ok() and not action_client.receive_data:
-        rclpy.spin_once(node)
-    print(action_client.receive_data)
+        rclpy.spin_once(action_client)
     print("+++++++++++===========++++++++++++++++")
     print("class_id")
     print(action_client.class_id)

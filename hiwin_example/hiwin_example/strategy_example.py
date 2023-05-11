@@ -36,21 +36,27 @@ class States(Enum):
     MOVE_TO_PLACE_POSE = 6
     CLOSE_ROBOT = 7
 
-class ExampleStrategy(Node):
+class ExampleStrategy():
 
-    def __init__(self):
-        super().__init__('example_strategy')
-        self.hiwin_client = self.create_client(RobotCommand, 'hiwinmodbus_service')
+    def __init__(self,node):
+        super().__init__()
+        self._node = node
+        self.hiwin_client = self._node.create_client(RobotCommand, 'hiwinmodbus_service')
         self.object_pose = None
         self.object_cnt = 0
-
+        
+        self.class_id = []
+        self.center_x = []
+        self.center_y = []
+        self.probability = []
+        
     def _state_machine(self, state: States) -> States:
         if state == States.INIT:
-            self.get_logger().info('INIT')
+            self._node.get_logger().info('INIT')
             nest_state = States.MOVE_TO_PHOTO_POSE
 
         elif state == States.MOVE_TO_PHOTO_POSE:
-            self.get_logger().info('MOVE_TO_PHOTO_POSE')
+            self._node.get_logger().info('MOVE_TO_PHOTO_POSE')
             pose = Twist()
             req = self.generate_robot_request(
                 cmd_type=RobotCommand.Request.JOINTS_CMD,
@@ -63,7 +69,7 @@ class ExampleStrategy(Node):
                 nest_state = None
 
         elif state == States.YOLO_DETECT:
-            self.get_logger().info('YOLO_DETECT')
+            self._node.get_logger().info('YOLO_DETECT')
             res = self.call_yolo()
             # OBJECT_POSE here for example, should get obj pose according to yolo result
             if res.has_object:
@@ -73,7 +79,7 @@ class ExampleStrategy(Node):
                 nest_state = States.CLOSE_ROBOT
 
         elif state == States.MOVE_TO_OPJECT_TOP:
-            self.get_logger().info('MOVE_TO_OPJECT_TOP')
+            self._node.get_logger().info('MOVE_TO_OPJECT_TOP')
             pose = Twist()
             [pose.linear.x, pose.linear.y, pose.linear.z] = self.object_pose[0:3]
             [pose.angular.x, pose.angular.y, pose.angular.z] = self.object_pose[3:6]
@@ -88,7 +94,7 @@ class ExampleStrategy(Node):
                 nest_state = None
 
         elif state == States.PICK_OBJECT:
-            self.get_logger().info('PICK_OBJECT')
+            self._node.get_logger().info('PICK_OBJECT')
             pose = Twist()
             [pose.linear.x, pose.linear.y, pose.linear.z] = self.object_pose[0:3]
             [pose.angular.x, pose.angular.y, pose.angular.z] = self.object_pose[3:6]
@@ -123,7 +129,7 @@ class ExampleStrategy(Node):
                 nest_state = None
 
         elif state == States.MOVE_TO_PLACE_POSE:
-            self.get_logger().info('MOVE_TO_PLACE_POSE')
+            self._node.get_logger().info('MOVE_TO_PLACE_POSE')
             pose = Twist()
             req = self.generate_robot_request(
                 cmd_type=RobotCommand.Request.JOINTS_CMD,
@@ -149,14 +155,14 @@ class ExampleStrategy(Node):
                 nest_state = None
 
         elif state == States.CLOSE_ROBOT:
-            self.get_logger().info('CLOSE_ROBOT')
+            self._node.get_logger().info('CLOSE_ROBOT')
             req = self.generate_robot_request(cmd_mode=RobotCommand.Request.CLOSE)
             res = self.call_hiwin(req)
             nest_state = States.FINISH
 
         else:
             nest_state = None
-            self.get_logger().error('Input state not supported!')
+            self._node.get_logger().error('Input state not supported!')
             # return
         return nest_state
 
@@ -211,7 +217,7 @@ class ExampleStrategy(Node):
 
     def call_hiwin(self, req):
         while not self.hiwin_client.wait_for_service(timeout_sec=2.0):
-            self.get_logger().info('service not available, waiting again...')
+            self._node.get_logger().info('service not available, waiting again...')
         future = self.hiwin_client.call_async(req)
         if self._wait_for_future_done(future):
             res = future.result()
@@ -219,15 +225,37 @@ class ExampleStrategy(Node):
             res = None
         return res
 
+
+    def call_YoloDetector(self):
+        action_client = YoloDetectorActionClient(self._node)
+        action_client.send_goal()
+        while rclpy.ok() and not action_client.receive_data:
+            if action_client.receive_data:
+                break
+        print("+++++++++++===========++++++++++++++++")
+        print("class_id")
+        print(action_client.class_id)
+        print("probability")
+        print(action_client.probability)
+        print("center_x")
+        print(action_client.center_x)
+        print("center_y")
+        print(action_client.center_y)
+
     def call_yolo(self):
         class YoloResponse(NamedTuple):
             has_object: bool
             object_pose: list
         has_object = True if self.object_cnt < 5 else False
+        
+        # t = Thread(target = self.call_YoloDetector) 
+        # t.start()
+        self.call_YoloDetector()
+                
         object_pose = OBJECT_POSE
         res = YoloResponse(has_object,object_pose)
-        # res.has_object = True if self.object_cnt < 5 else False
-        # res.object_pose = OBJECT_POSE
+
+        # t.join()
         self.object_cnt += 1
         return res
 
@@ -236,13 +264,15 @@ class ExampleStrategy(Node):
         self.main_loop_thread.daemon = True
         self.main_loop_thread.start()
 
+    
 def main(args=None):
     rclpy.init(args=args)
+    node = rclpy.create_node('example_strategy')
 
-    stratery = ExampleStrategy()
+    stratery = ExampleStrategy(node)
     stratery.start_main_loop_thread()
 
-    rclpy.spin(stratery)
+    rclpy.spin(node)
     rclpy.shutdown()
 
 if __name__ == "__main__":
