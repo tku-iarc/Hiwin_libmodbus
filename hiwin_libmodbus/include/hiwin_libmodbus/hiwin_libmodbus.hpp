@@ -87,6 +87,46 @@ public:
   int qqq{0};
   // int ArmState;
 
+
+
+  int A1_Low;
+  int A1_High; 
+  int A2_Low;
+  int A2_High; 
+  int A3_Low;
+  int A3_High; 
+  int A4_Low;
+  int A4_High;
+  int A5_Low;
+  int A5_High;
+  int A6_Low;
+  int A6_High;
+  double joint1;
+  double joint2;
+  double joint3;
+  double joint4;
+  double joint5;
+  double joint6;
+
+  int X_Low;
+  int X_High; 
+  int Y_Low;
+  int Y_High; 
+  int Z_Low;
+  int Z_High; 
+  int RX_Low;
+  int RX_High;
+  int RY_Low;
+  int RY_High;
+  int RZ_Low;
+  int RZ_High;
+  double posex;
+  double posey;
+  double posez;
+  double rx;
+  double ry;  
+  double rz;  
+
 private:
   modbus_t        *ctx_{nullptr};
   int             wrt_{0};

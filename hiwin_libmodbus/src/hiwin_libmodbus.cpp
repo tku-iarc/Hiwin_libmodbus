@@ -118,13 +118,61 @@ void HiwinLibmodbus::HOME(){
 
 void HiwinLibmodbus::getArmJoints(std::vector<double> &Joints){
     uint16_t regs[MAX_READ_REGISTERS] = {0};
-    modbus_read_input_registers(ctx_, ROBOT_MOVE_STATE, MOVE_STATE_LEN, regs);
-    double joint1 = static_cast<double>(regs[0])*65.536; 
-    double joint2 = static_cast<double>(regs[0])*65.536; 
-    double joint3 = static_cast<double>(regs[0])*65.536; 
-    double joint4 = static_cast<double>(regs[0])*65.536; 
-    double joint5 = static_cast<double>(regs[0])*65.536; 
-    double joint6 = static_cast<double>(regs[0])*65.536; 
+    modbus_read_input_registers(ctx_, 300, MOVE_STATE_LEN, regs);
+    A1_Low  = static_cast<int>(regs[0]);
+    modbus_read_input_registers(ctx_, 301, MOVE_STATE_LEN, regs);
+    A1_High = static_cast<int>(regs[0]);
+    modbus_read_input_registers(ctx_, 302, MOVE_STATE_LEN, regs);
+    A2_Low  = static_cast<int>(regs[0]);
+    modbus_read_input_registers(ctx_, 303, MOVE_STATE_LEN, regs);
+    A2_High = static_cast<int>(regs[0]);
+    modbus_read_input_registers(ctx_, 304, MOVE_STATE_LEN, regs);
+    A3_Low  = static_cast<int>(regs[0]);
+    modbus_read_input_registers(ctx_, 305, MOVE_STATE_LEN, regs);
+    A3_High = static_cast<int>(regs[0]);
+    modbus_read_input_registers(ctx_, 306, MOVE_STATE_LEN, regs);
+    A4_Low  = static_cast<int>(regs[0]);
+    modbus_read_input_registers(ctx_, 307, MOVE_STATE_LEN, regs);
+    A4_High = static_cast<int>(regs[0]);
+    modbus_read_input_registers(ctx_, 308, MOVE_STATE_LEN, regs);
+    A5_Low  = static_cast<int>(regs[0]);
+    modbus_read_input_registers(ctx_, 309, MOVE_STATE_LEN, regs);
+    A5_High = static_cast<int>(regs[0]);
+    modbus_read_input_registers(ctx_, 310, MOVE_STATE_LEN, regs);
+    A6_Low  = static_cast<int>(regs[0]);
+    modbus_read_input_registers(ctx_, 311, MOVE_STATE_LEN, regs);
+    A6_High = static_cast<int>(regs[0]);
+
+    if (A1_Low >= 0)
+      joint1 = (65536*A1_High + A1_Low)*0.001;
+    else
+      joint1 = (65536*(A1_High+1) + A1_Low)*0.001;
+
+    if (A2_Low >= 0)
+      joint2 = (65536*A2_High + A2_Low)*0.001;
+    else
+      joint2 = (65536*(A2_High+1) + A2_Low)*0.001;
+
+    if (A3_Low >= 0)
+      joint3 = (65536*A3_High + A3_Low)*0.001;
+    else
+      joint3 = (65536*(A3_High+1) + A3_Low)*0.001;
+
+    if (A4_Low >= 0)
+      joint4 = (65536*A4_High + A4_Low)*0.001;
+    else
+      joint4 = (65536*(A4_High+1) + A4_Low)*0.001;
+
+    if (A5_Low >= 0)
+      joint5 = (65536*A5_High + A5_Low)*0.001;
+    else
+      joint5 = (65536*(A5_High+1) + A5_Low)*0.001;
+
+    if (A6_Low >= 0)
+      joint6 = (65536*A6_High + A6_Low)*0.001;
+    else
+      joint6 = (65536*(A6_High+1) + A6_Low)*0.001;
+
     Joints.push_back(joint1);
     Joints.push_back(joint2);
     Joints.push_back(joint3);
@@ -136,13 +184,62 @@ void HiwinLibmodbus::getArmJoints(std::vector<double> &Joints){
 
 void HiwinLibmodbus::getArmPose(std::vector<double> &Pose){
     uint16_t regs[MAX_READ_REGISTERS] = {0};
-    modbus_read_input_registers(ctx_, ROBOT_MOVE_STATE, MOVE_STATE_LEN, regs);
-    double posex = static_cast<double>(regs[0])*65.536; 
-    double posey = static_cast<double>(regs[0])*65.536; 
-    double posez = static_cast<double>(regs[0])*65.536; 
-    double rx    = static_cast<double>(regs[0])*65.536; 
-    double ry    = static_cast<double>(regs[0])*65.536; 
-    double rz    = static_cast<double>(regs[0])*65.536; 
+    modbus_read_input_registers(ctx_, 400, MOVE_STATE_LEN, regs);
+    X_Low   = static_cast<int>(regs[0]);
+    modbus_read_input_registers(ctx_, 401, MOVE_STATE_LEN, regs);
+    X_High  = static_cast<int>(regs[0]);
+    modbus_read_input_registers(ctx_, 402, MOVE_STATE_LEN, regs);
+    Y_Low   = static_cast<int>(regs[0]);
+    modbus_read_input_registers(ctx_, 403, MOVE_STATE_LEN, regs);
+    Y_High  = static_cast<int>(regs[0]);
+    modbus_read_input_registers(ctx_, 404, MOVE_STATE_LEN, regs);
+    Z_Low   = static_cast<int>(regs[0]);
+    modbus_read_input_registers(ctx_, 405, MOVE_STATE_LEN, regs);
+    Z_High  = static_cast<int>(regs[0]);
+    modbus_read_input_registers(ctx_, 406, MOVE_STATE_LEN, regs);
+    RX_Low  = static_cast<int>(regs[0]);
+    modbus_read_input_registers(ctx_, 407, MOVE_STATE_LEN, regs);
+    RX_High = static_cast<int>(regs[0]);
+    modbus_read_input_registers(ctx_, 408, MOVE_STATE_LEN, regs);
+    RY_Low  = static_cast<int>(regs[0]);
+    modbus_read_input_registers(ctx_, 409, MOVE_STATE_LEN, regs);
+    RY_High = static_cast<int>(regs[0]);
+    modbus_read_input_registers(ctx_, 410, MOVE_STATE_LEN, regs);
+    RZ_Low  = static_cast<int>(regs[0]);
+    modbus_read_input_registers(ctx_, 411, MOVE_STATE_LEN, regs);
+    RZ_High = static_cast<int>(regs[0]);
+
+
+    if (X_Low >= 0)
+      posex = (65536*X_High + X_Low)*0.001;
+    else
+      posex = (65536*(X_High+1) + X_Low)*0.001;
+
+    if (Y_Low >= 0)
+      posey = (65536*Y_High + Y_Low)*0.001;
+    else
+      posey = (65536*(Y_High+1) + Y_Low)*0.001;
+
+    if (Z_Low >= 0)
+      posez = (65536*Z_High + Z_Low)*0.001;
+    else
+      posez = (65536*(Z_High+1) + Z_Low)*0.001;
+
+    if (RX_Low >= 0)
+      rx = (65536*RX_High + RX_Low)*0.001;
+    else
+      rx = (65536*(RX_High+1) + RX_Low)*0.001;
+
+    if (RY_Low >= 0)
+      ry = (65536*RY_High + RY_Low)*0.001;
+    else
+      ry = (65536*(RY_High+1) + RY_Low)*0.001;
+
+    if (RZ_Low >= 0)
+      rz = (65536*RZ_High + RZ_Low)*0.001;
+    else
+      rz = (65536*(RZ_High+1) + RZ_Low)*0.001;
+
     Pose.push_back(posex);
     Pose.push_back(posey);
     Pose.push_back(posez);

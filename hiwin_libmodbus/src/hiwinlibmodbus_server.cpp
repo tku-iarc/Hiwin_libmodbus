@@ -112,6 +112,7 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
             }
             else if (request->cmd_mode == 9){
                 hiwinlibmodbus.getArmPose(current_pos); 
+                std::cout<<"----------------------------------"<<std::endl;
                 response->current_position = current_pos;
             }
             else if (request->cmd_mode == 10){
@@ -123,7 +124,6 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
             }
             if (request->holding == true){
                 while(1){
-                    std::cout<<"----------------------------------"<<std::endl;
                     hiwinlibmodbus.Arm_State_REGISTERS(arm_state); // return arm_state
                     // int arm_state = hiwinlibmodbus.Check_Arm_State();
                     if (arm_state == 1){

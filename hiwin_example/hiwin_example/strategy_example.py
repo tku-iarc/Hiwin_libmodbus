@@ -9,7 +9,7 @@ from typing import NamedTuple
 from geometry_msgs.msg import Twist
 
 from hiwin_interfaces.srv import RobotCommand
-from YoloDetector import YoloDetectorActionClient
+# from YoloDetector import YoloDetectorActionClient
 
 DEFAULT_VELOCITY = 20
 DEFAULT_ACCELERATION = 20
@@ -34,7 +34,8 @@ class States(Enum):
     MOVE_TO_OPJECT_TOP = 4
     PICK_OBJECT = 5
     MOVE_TO_PLACE_POSE = 6
-    CLOSE_ROBOT = 7
+    CHECK_POSE = 7
+    CLOSE_ROBOT = 8
 
 class ExampleStrategy(Node):
 
@@ -70,7 +71,8 @@ class ExampleStrategy(Node):
                 self.object_pose = res.object_pose
                 nest_state = States.MOVE_TO_OPJECT_TOP
             else:
-                nest_state = States.CLOSE_ROBOT
+                nest_state = States.CHECK_POSE
+                # nest_state = States.CLOSE_ROBOT
 
         elif state == States.MOVE_TO_OPJECT_TOP:
             self.get_logger().info('MOVE_TO_OPJECT_TOP')
@@ -145,6 +147,17 @@ class ExampleStrategy(Node):
             res = self.call_hiwin(req)
             if res.arm_state == RobotCommand.Response.IDLE:
                 nest_state = States.MOVE_TO_PHOTO_POSE
+            else:
+                nest_state = None
+
+        elif state == States.CHECK_POSE:
+            self.get_logger().info('CHECK_POSE')
+            req = self.generate_robot_request(
+                cmd_mode=RobotCommand.Request.CHECK_JOINT)
+            res = self.call_hiwin(req)
+            print(res.current_position)
+            if res.arm_state == RobotCommand.Response.IDLE:
+                nest_state = States.CLOSE_ROBOT
             else:
                 nest_state = None
 
