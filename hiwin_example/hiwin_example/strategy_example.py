@@ -197,6 +197,8 @@ class ExampleStrategy(Node):
             cmd_type=RobotCommand.Request.POSE_CMD,
             velocity=DEFAULT_VELOCITY,
             acceleration=DEFAULT_ACCELERATION,
+            tool=1,
+            base=0,
             digital_output_pin=0,
             digital_output_cmd=RobotCommand.Request.DIGITAL_OFF,
             pose=Twist(),
@@ -212,6 +214,8 @@ class ExampleStrategy(Node):
         request.acceleration = acceleration
         request.jog_joint = jog_joint
         request.velocity = velocity
+        request.tool = tool
+        request.base = base
         request.cmd_mode = cmd_mode
         request.cmd_type = cmd_type
         request.circ_end = circ_end

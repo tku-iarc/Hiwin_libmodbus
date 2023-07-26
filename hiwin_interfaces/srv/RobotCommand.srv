@@ -28,6 +28,8 @@ uint8 cmd_mode
 uint8 cmd_type
 uint8 velocity
 uint8 acceleration
+uint8 tool
+uint8 base
 
 
 uint8 digital_output_pin
