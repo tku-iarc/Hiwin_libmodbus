@@ -199,6 +199,7 @@ class ExampleStrategy(Node):
             acceleration=DEFAULT_ACCELERATION,
             tool=1,
             base=0,
+            digital_input_pin=0,
             digital_output_pin=0,
             digital_output_cmd=RobotCommand.Request.DIGITAL_OFF,
             pose=Twist(),
@@ -209,6 +210,7 @@ class ExampleStrategy(Node):
             jog_dir=0
             ):
         request = RobotCommand.Request()
+        request.digital_input_pin = digital_input_pin
         request.digital_output_pin = digital_output_pin
         request.digital_output_cmd = digital_output_cmd
         request.acceleration = acceleration

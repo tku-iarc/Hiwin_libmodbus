@@ -12,6 +12,7 @@ uint8 CHECK_JOINT=8
 uint8 CHECK_POSE=9
 uint8 CLOSE=10
 uint8 WAITING=11
+uint8 READ_REGISTERS=12
 
 
 # cmd type
@@ -31,7 +32,7 @@ uint8 acceleration
 uint8 tool
 uint8 base
 
-
+uint8 digital_input_pin
 uint8 digital_output_pin
 uint8 digital_output_cmd
 
@@ -55,4 +56,5 @@ uint8 HOLD=3
 uint8 DELAY=4
 
 uint8 arm_state
+uint8 digital_state
 float64[] current_position

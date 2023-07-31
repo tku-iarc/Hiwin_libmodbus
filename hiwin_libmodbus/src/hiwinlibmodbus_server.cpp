@@ -28,6 +28,7 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
     private:
                 
         int arm_state;
+        int digital_state;
         std::vector<double> current_pos;
         std::vector<double> command;
         int command_type;
@@ -119,6 +120,10 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
             }
             else if (request->cmd_mode == 11){
                 request->holding = true;
+            }
+            else if (request->cmd_mode == 12){
+                hiwinlibmodbus.Read_REGISTERS(299+request->digital_input_pin, digital_state);
+                response->arm_state = digital_state;
             }
             if (request->holding == true){
                 while(1){
