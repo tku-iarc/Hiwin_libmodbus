@@ -77,6 +77,12 @@ void HiwinLibmodbus::Read_REGISTERS(int addr, int &state){
   state = static_cast<int>(regs[0]); // convert uint_val to int_val
 }
 
+void HiwinLibmodbus::Read_DI(int addr, int &state){
+  uint8_t regs[MAX_READ_REGISTERS] = {0};
+  ret_ = modbus_read_input_bits(ctx_, addr, MOVE_STATE_LEN, regs);
+  state = static_cast<int>(regs[0]); // convert uint_val to int_val
+}
+
 /************* Discret_e Input *************/
   /*********************************
         S0
@@ -117,7 +123,6 @@ void HiwinLibmodbus::HOME(){
 
 
 void HiwinLibmodbus::getArmJoints(std::vector<double> &Joints){
-    Joints.clear();
     uint16_t regs[MAX_READ_REGISTERS] = {0};
     modbus_read_input_registers(ctx_, 300, MOVE_STATE_LEN, regs);
     A1_Low  = static_cast<int>(regs[0]);
@@ -184,7 +189,6 @@ void HiwinLibmodbus::getArmJoints(std::vector<double> &Joints){
 }
 
 void HiwinLibmodbus::getArmPose(std::vector<double> &Pose){
-    Pose.clear();
     uint16_t regs[MAX_READ_REGISTERS] = {0};
     modbus_read_input_registers(ctx_, 400, MOVE_STATE_LEN, regs);
     X_Low   = static_cast<int>(regs[0]);

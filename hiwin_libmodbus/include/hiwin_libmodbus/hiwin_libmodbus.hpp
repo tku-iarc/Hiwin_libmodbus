@@ -55,6 +55,8 @@ public:
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void Read_REGISTERS(int addr, int &state);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
+  void Read_DI(int addr, int &state);
+  HIWIN_LIBMODBUS_PUBLIC_TYPE
   void DO(int DO_Num, int active);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void HOME();
