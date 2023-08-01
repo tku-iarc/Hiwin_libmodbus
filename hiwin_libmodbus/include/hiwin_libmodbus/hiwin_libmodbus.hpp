@@ -133,6 +133,7 @@ private:
   modbus_t        *ctx_{nullptr};
   int             wrt_{0};
   int             ret_{0};
+  int             i;
   // int             joint1_{0};
   // int             joint2_{0};
   // int             joint3_{0};
