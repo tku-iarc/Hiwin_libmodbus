@@ -79,7 +79,7 @@ void HiwinLibmodbus::Read_REGISTERS(int addr, int &state){
 
 void HiwinLibmodbus::Read_DI(int addr, int &state){
   uint8_t bits[MODBUS_MAX_READ_BITS] = {0};
-  ret_ = modbus_read_input_bits(ctx_, addr, MOVE_STATE_LEN, bits);
+  ret_ = modbus_read_input_bits(ctx_, addr, 32, bits);
   if (ret_ < 0) {
        fprintf(stderr, "%s\n", modbus_strerror(errno));
   } else {
