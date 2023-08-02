@@ -436,4 +436,108 @@ void HiwinLibmodbus::JOG(uint16_t joint,uint16_t dir){
   wrt_ = modbus_write_registers(ctx_, REGISTERS_ADDRESS, 3, table);
   wrt_ = modbus_write_register(ctx_, 200, 1);
 }
+
+void HiwinLibmodbus::SET_BASE(uint16_t base_num, const std::vector<double> POSE){
+  const double* pose = &POSE[0];
+  return SET_BASE(base_num, pose);
+}
+void HiwinLibmodbus::SET_BASE(uint16_t base_num, const double *POSE){
+  // double Angle[6] = {joint1, joint2, joint3, joint4, joint5, joint6};
+  // TODO: the arguments should be defined, 
+  // number can't be directly written here, people will confused what it is.
+  uint16_t A_L[6] = {0};
+  uint16_t A_H[6] = {0};
+  double num = 0;
+
+  for (int i = 0; i < 6; i++)
+  {
+    num = POSE[i] - (int)POSE[i];
+    if (POSE[i] >= 0)
+    {
+      // angle > 0 ex. 90
+      A_L[i] = ((int)POSE[i]*1000)%65536;
+      A_L[i] = A_L[i] + (num*1000);
+      if (A_L[i] > 32767)
+      {
+        A_L[i] = (((int)POSE[i]*1000)%65536)-65536;
+        A_L[i] = A_L[i] + (num*1000);
+      }
+      A_H[i] = (POSE[i]*1000)/65536;
+    }else
+    {
+      // angle < 0 ex.-90
+      A_L[i] = (((int)POSE[i]*1000)%65536)+65536;
+      A_L[i] = A_L[i] + (num*1000);
+      A_H[i] = ((POSE[i]*1000)/65536)-1;
+    }
+  }
+  
+  uint16_t table[14] = {102, base_num, 
+                          A_L[0], A_H[0], 
+                          A_L[1], A_H[1], 
+                          A_L[2], A_H[2], 
+                          A_L[3], A_H[3], 
+                          A_L[4], A_H[4], 
+                          A_L[5], A_H[5],};
+
+  /*********************** test ***********************/
+  // uint16_t table[26] = {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  //                       vel, acc, TOOL, BASE, 0, 0, 0, 0, 0, 0, 0, 0};
+  /*********************** test ***********************/
+
+  wrt_ = modbus_write_registers(ctx_, REGISTERS_ADDRESS, 14, table);
+  wrt_ = modbus_write_register(ctx_, 200, 1);
+}
+
+void HiwinLibmodbus::SET_TOOL(uint16_t tool_num, const std::vector<double> POSE){
+  const double* pose = &POSE[0];
+  return SET_BASE(tool_num, pose);
+}
+void HiwinLibmodbus::SET_TOOL(uint16_t tool_num, const double *POSE){
+  // double Angle[6] = {joint1, joint2, joint3, joint4, joint5, joint6};
+  // TODO: the arguments should be defined, 
+  // number can't be directly written here, people will confused what it is.
+  uint16_t A_L[6] = {0};
+  uint16_t A_H[6] = {0};
+  double num = 0;
+
+  for (int i = 0; i < 6; i++)
+  {
+    num = POSE[i] - (int)POSE[i];
+    if (POSE[i] >= 0)
+    {
+      // angle > 0 ex. 90
+      A_L[i] = ((int)POSE[i]*1000)%65536;
+      A_L[i] = A_L[i] + (num*1000);
+      if (A_L[i] > 32767)
+      {
+        A_L[i] = (((int)POSE[i]*1000)%65536)-65536;
+        A_L[i] = A_L[i] + (num*1000);
+      }
+      A_H[i] = (POSE[i]*1000)/65536;
+    }else
+    {
+      // angle < 0 ex.-90
+      A_L[i] = (((int)POSE[i]*1000)%65536)+65536;
+      A_L[i] = A_L[i] + (num*1000);
+      A_H[i] = ((POSE[i]*1000)/65536)-1;
+    }
+  }
+  
+  uint16_t table[14] = {101, tool_num, 
+                          A_L[0], A_H[0], 
+                          A_L[1], A_H[1], 
+                          A_L[2], A_H[2], 
+                          A_L[3], A_H[3], 
+                          A_L[4], A_H[4], 
+                          A_L[5], A_H[5],};
+
+  /*********************** test ***********************/
+  // uint16_t table[26] = {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  //                       vel, acc, TOOL, BASE, 0, 0, 0, 0, 0, 0, 0, 0};
+  /*********************** test ***********************/
+
+  wrt_ = modbus_write_registers(ctx_, REGISTERS_ADDRESS, 14, table);
+  wrt_ = modbus_write_register(ctx_, 200, 1);
+}
 // }  // namespace hiwin_libmodbus

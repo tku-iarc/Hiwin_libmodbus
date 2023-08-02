@@ -85,6 +85,14 @@ public:
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void JOG(
     uint16_t joint,uint16_t dir);
+  void SET_BASE(uint16_t base_num, const std::vector<double> POSE);
+  HIWIN_LIBMODBUS_PUBLIC_TYPE
+  void SET_BASE(uint16_t base_num, const double *POSE);
+  HIWIN_LIBMODBUS_PUBLIC_TYPE
+  void SET_TOOL(uint16_t tool_num, const std::vector<double> POSE);
+  HIWIN_LIBMODBUS_PUBLIC_TYPE
+  void SET_TOOL(uint16_t tool_num, const double *POSE);
+  
 
   int qqq{0};
   // int ArmState;
