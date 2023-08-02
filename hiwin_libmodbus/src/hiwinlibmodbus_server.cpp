@@ -124,6 +124,19 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
             else if (request->cmd_mode == 12){
                 hiwinlibmodbus.Read_DI(299+request->digital_input_pin, digital_state);
                 response->digital_state = digital_state;
+                request->holding == false;
+            }
+            else if (request->cmd_mode == 13){
+                command={request->pose.linear.x, request->pose.linear.y, request->pose.linear.z,
+                request->pose.angular.x, request->pose.angular.y, request->pose.angular.z};
+                hiwinlibmodbus.SET_BASE(request->base_num, command);
+                request->holding == false;
+            }
+            else if (request->cmd_mode == 14){
+                command={request->pose.linear.x, request->pose.linear.y, request->pose.linear.z,
+                request->pose.angular.x, request->pose.angular.y, request->pose.angular.z};
+                hiwinlibmodbus.SET_TOOL(request->tool_num, command);
+                request->holding == false;
             }
             if (request->holding == true){
                 while(1){

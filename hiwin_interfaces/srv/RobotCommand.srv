@@ -13,6 +13,8 @@ uint8 CHECK_POSE=9
 uint8 CLOSE=10
 uint8 WAITING=11
 uint8 READ_DI=12
+uint8 SET_BASE=13
+uint8 SET_TOOL=14
 
 
 # cmd type
@@ -31,6 +33,8 @@ uint8 velocity
 uint8 acceleration
 uint8 tool
 uint8 base
+uint8 base_num
+uint8 tool_num
 
 uint8 digital_input_pin
 uint8 digital_output_pin
