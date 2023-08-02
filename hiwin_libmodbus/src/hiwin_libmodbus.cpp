@@ -80,15 +80,15 @@ void HiwinLibmodbus::Read_REGISTERS(int addr, int &state){
 void HiwinLibmodbus::Read_DI(int addr, int &state){
   uint8_t bits[MODBUS_MAX_READ_BITS] = {0};
   ret_ = modbus_read_input_bits(ctx_, addr, 32, bits);
-  if (ret_ < 0) {
-       fprintf(stderr, "%s\n", modbus_strerror(errno));
-  } else {
-      printf("BITS COILS:\n");
-      for (i=0; i < ret_; i++) {
-          printf("[%d]=%d\n", i, bits[i]);
-      }
-  }
-  // state = static_cast<int>(bits[0]); // convert uint_val to int_val
+  // if (ret_ < 0) {
+  //      fprintf(stderr, "%s\n", modbus_strerror(errno));
+  // } else {
+  //     printf("BITS COILS:\n");
+  //     for (i=0; i < ret_; i++) {
+  //         printf("[%d]=%d\n", i, bits[i]);
+  //     }
+  // }
+  state = static_cast<int>(bits[addr-298]); // convert uint_val to int_val
 }
 
 /************* Discret_e Input *************/

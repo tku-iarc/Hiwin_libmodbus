@@ -122,7 +122,7 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
                 request->holding = true;
             }
             else if (request->cmd_mode == 12){
-                hiwinlibmodbus.Read_DI(299+request->digital_input_pin, digital_state);
+                hiwinlibmodbus.Read_DI(297+request->digital_input_pin, digital_state);
                 response->arm_state = digital_state;
             }
             if (request->holding == true){

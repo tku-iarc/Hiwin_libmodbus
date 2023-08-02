@@ -11,6 +11,18 @@ from geometry_msgs.msg import Twist
 from hiwin_interfaces.srv import RobotCommand
 # from YoloDetector import YoloDetectorActionClient
 
+from math import *
+import numpy as np
+import quaternion as qtn
+from hiwin_example import transformations
+
+from tf2_ros import TransformBroadcaster
+
+from tf2_ros import TransformException
+from tf2_ros.buffer import Buffer
+from tf2_ros.transform_listener import TransformListener
+from geometry_msgs.msg import TransformStamped
+
 DEFAULT_VELOCITY = 20
 DEFAULT_ACCELERATION = 20
 
@@ -30,8 +42,8 @@ class States(Enum):
     INIT = 0
     FINISH = 1
     MOVE_TO_PHOTO_POSE = 2
-    YOLO_DETECT = 3
-    MOVE_TO_OPJECT_TOP = 4
+    GET_CALI_POINT = 3
+    MOVE_TO_CALI_POINT = 4
     PICK_OBJECT = 5
     MOVE_TO_PLACE_POSE = 6
     CHECK_POSE = 7
@@ -41,12 +53,16 @@ class ThreePointsCalibration(Node):
 
     def __init__(self):
         super().__init__('three_points_calibration')
-        self.calibration_server = self.create_service(RobotCommand, 
-                                                    'calibration_points',
-                                                    self.start_calibration_thread)
+        self.calibration_server = self.create_client(RobotCommand, 
+                                                    'calibration_points')
         self.hiwin_client = self.create_client(RobotCommand, 'hiwinmodbus_service')
         self.object_pose = None
         self.object_cnt = 0
+        self.cali_cnt = 0
+
+        self.tf_buffer = Buffer()
+        self.tf_listener = TransformListener(self.tf_buffer, self)
+        self.tf_broadcaster = TransformBroadcaster(self)
 
     def _state_machine(self, state: States) -> States:
         if state == States.INIT:
@@ -62,23 +78,29 @@ class ThreePointsCalibration(Node):
                 )
             res = self.call_hiwin(req)
             if res.arm_state == RobotCommand.Response.IDLE:
-                nest_state = States.YOLO_DETECT
+                nest_state = States.GET_CALI_POINT
             else:
                 nest_state = None
 
-        elif state == States.YOLO_DETECT:
-            self.get_logger().info('YOLO_DETECT')
-            res = self.call_yolo()
-            # OBJECT_POSE here for example, should get obj pose according to yolo result
-            if res.has_object:
-                self.object_pose = res.object_pose
-                nest_state = States.MOVE_TO_OPJECT_TOP
+        elif state == States.GET_CALI_POINT:
+            self.get_logger().info('GET_CALI_POINT')
+            self.call_for_aruco()
+            if len(res.marker_id) != 0:
+                cali_pose = self.convert_arm_pose(res.pose_array)
+                # self.object_pose = res.pose_array
+                nest_state = States.MOVE_TO_CALI_POINT
             else:
-                nest_state = States.CHECK_POSE
+                if self.cali_cnt > 5:
+                    self.get_logger().info('get aruco marker failed')
+                    self.cali_cnt = 0
+                    nest_state = States.CLOSE_ROBOT
+                else:
+                    self.cali_cnt += 1
+                    nest_state = States.GET_CALI_POINT
                 # nest_state = States.CLOSE_ROBOT
 
-        elif state == States.MOVE_TO_OPJECT_TOP:
-            self.get_logger().info('MOVE_TO_OPJECT_TOP')
+        elif state == States.MOVE_TO_CALI_POINT:
+            self.get_logger().info('MOVE_TO_CALI_POINT')
             pose = Twist()
             [pose.linear.x, pose.linear.y, pose.linear.z] = self.object_pose[0:3]
             [pose.angular.x, pose.angular.y, pose.angular.z] = self.object_pose[3:6]
@@ -241,6 +263,82 @@ class ThreePointsCalibration(Node):
             res = None
         return res
 
+    def call_for_aruco(self, req):
+        while not self.calibration_server.wait_for_service(timeout_sec=2.0):
+            self.get_logger().info('service not available, waiting again...')
+        future = self.calibration_server.call_async(req)
+        if self._wait_for_future_done(future):
+            res = future.result()
+        else:
+            res = None
+        return res
+
+    def convert_arm_pose(self, aruco_pose):
+
+
+        cam2tool_rot = qtn.as_rotation_matrix(np.quaternion(transform.orientation.w, 
+                                                            transform.orientation.x, 
+                                                            transform.orientation.y, 
+                                                            transform.orientation.z))
+        cam2tool_trans = np.array([[transform.position.x],
+                                   [transform.position.y],
+                                   [transform.position.z]])
+        
+        cam2tool_mat = np.append(cam2tool_rot, cam2tool_trans, axis=1)
+        cam2tool_mat = np.append(cam2tool_mat, np.array([[0., 0., 0., 1.]]), axis=0)
+        # transform_mat = np.linalg.inv(transform_mat)
+
+        base2tool_rot = qtn.as_rotation_matrix(np.quaternion(transform.orientation.w, 
+                                                             transform.orientation.x, 
+                                                             transform.orientation.y, 
+                                                             transform.orientation.z))
+        base2tool_trans = np.array([[transform.position.x],
+                                    [transform.position.y],
+                                    [transform.position.z]])
+        
+        base2tool_mat = np.append(base2tool_rot, base2tool_trans, axis=1)
+        base2tool_mat = np.append(base2tool_mat, np.array([[0., 0., 0., 1.]]), axis=0)
+
+
+
+        cam2aruco_rot = qtn.as_rotation_matrix(np.quaternion(transform.orientation.w, 
+                                                             transform.orientation.x, 
+                                                             transform.orientation.y, 
+                                                             transform.orientation.z))
+        cam2aruco_trans = np.array([[transform.position.x],
+                                    [transform.position.y],
+                                    [transform.position.z]])
+        
+        cam2aruco_mat = np.append(cam2aruco_rot, cam2aruco_trans, axis=1)
+        cam2aruco_mat = np.append(cam2aruco_mat, np.array([[0., 0., 0., 1.]]), axis=0)
+
+        base2cam_mat = np.matmul(base2tool_rot, cam2tool_mat)
+        base2aruco_mat = np.matmul(base2cam_mat, cam2aruco_mat)
+
+
+        ax, ay, az = transformations.euler_from_matrix(base2aruco_mat)
+        base2aruco_translation = transformations.translation_from_matrix(base2aruco_mat)*100.0
+        # print(angle[0]*180/pi)
+        # print(angle[1]*180/pi)
+        # print(angle[2]*180/pi)
+        calibrate_pose = [base2aruco_translation[0], 
+                       base2aruco_translation[1], 
+                       base2aruco_translation[2],
+                       ax, ay, az]
+
+        return calibrate_pose
+        # try:
+        #     t = self.tf_buffer.lookup_transform(
+        #         'base',
+        #         'ar_marker',
+        #         rclpy.time.Time())
+        #     print(t)
+        # except TransformException as ex:
+        #     self.get_logger().info(
+        #         f'Could not transform base to ar_marker: {ex}')
+        #     return
+
+   
     def call_yolo(self):
         class YoloResponse(NamedTuple):
             has_object: bool
@@ -258,11 +356,13 @@ class ThreePointsCalibration(Node):
         self.main_loop_thread.daemon = True
         self.main_loop_thread.start()
 
+
+
 def main(args=None):
     rclpy.init(args=args)
 
     stratery = ThreePointsCalibration()
-    # stratery.start_calibration_thread()
+    stratery.start_calibration_thread()
 
     rclpy.spin(stratery)
     rclpy.shutdown()
