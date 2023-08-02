@@ -88,7 +88,7 @@ void HiwinLibmodbus::Read_DI(int addr, int &state){
   //         printf("[%d]=%d\n", i, bits[i]);
   //     }
   // }
-  state = static_cast<int>(bits[addr-298]); // convert uint_val to int_val
+  state = static_cast<int>(bits[0]); // convert uint_val to int_val
 }
 
 /************* Discret_e Input *************/
