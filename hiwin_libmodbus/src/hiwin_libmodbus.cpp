@@ -131,6 +131,7 @@ void HiwinLibmodbus::HOME(){
 
 
 void HiwinLibmodbus::getArmJoints(std::vector<double> &Joints){
+    Joints.clear();
     uint16_t regs[MAX_READ_REGISTERS] = {0};
     modbus_read_input_registers(ctx_, 300, MOVE_STATE_LEN, regs);
     A1_Low  = static_cast<int>(regs[0]);
@@ -197,6 +198,7 @@ void HiwinLibmodbus::getArmJoints(std::vector<double> &Joints){
 }
 
 void HiwinLibmodbus::getArmPose(std::vector<double> &Pose){
+    Pose.clear();
     uint16_t regs[MAX_READ_REGISTERS] = {0};
     modbus_read_input_registers(ctx_, 400, MOVE_STATE_LEN, regs);
     X_Low   = static_cast<int>(regs[0]);

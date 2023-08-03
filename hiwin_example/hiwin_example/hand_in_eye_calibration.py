@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import time
+import keyboard
 import rclpy
 from enum import Enum
 from threading import Thread
@@ -9,7 +10,7 @@ from typing import NamedTuple
 from geometry_msgs.msg import Twist
 
 from hiwin_interfaces.srv import RobotCommand
-from ros2_aruco_interfaces.srv import ArucoMarkerInfo
+# from ros2_aruco_interfaces.srv import ArucoMarkerInfo
 # from YoloDetector import YoloDetectorActionClient
 
 from math import *
@@ -22,6 +23,7 @@ from tf2_ros import TransformBroadcaster
 
 from tf2_ros import TransformException
 from tf2_ros.buffer import Buffer
+from tf2_ros.static_transform_broadcaster import StaticTransformBroadcaster
 from tf2_ros.transform_listener import TransformListener
 from geometry_msgs.msg import TransformStamped
 
@@ -85,34 +87,51 @@ class HandInEyeCalibration(Node):
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
         self.tf_broadcaster = TransformBroadcaster(self)
+        self.tf_static_broadcaster = StaticTransformBroadcaster(self)
 
     def _state_machine(self, state: States) -> States:
         if state == States.INIT:
             self.get_logger().info('INIT')
+            
+            # t = TransformStamped()
+
+            # t.header.stamp = self.get_clock().now().to_msg()
+            # t.header.frame_id = 'world'
+            # t.child_frame_id = 'base_link'
+
+            # t.transform.translation.x = 0.0
+            # t.transform.translation.y = 0.0
+            # t.transform.translation.z = 0.0
+            
+            # t.transform.rotation.x = 0.0
+            # t.transform.rotation.y = 0.0
+            # t.transform.rotation.z = 0.0
+            # t.transform.rotation.w = 1.0
+
+            # self.tf_static_broadcaster.sendTransform(t)
+
             nest_state = States.BROADCASTE_POSE
 
         elif state == States.BROADCASTE_POSE:
             self.get_logger().info('BROADCASTE_POSE')
             pose = Twist()
             req = self.generate_robot_request(
-                cmd_type=RobotCommand.Request.CHECK_POSE,
+                cmd_mode=RobotCommand.Request.CHECK_POSE,
                 holding=False
                 )
             res = self.call_hiwin(req)
-            
-            res.current_position
 
             pose = TransformStamped()
             pose.header.stamp = self.get_clock().now().to_msg()
             pose.header.frame_id = 'base_link'
             pose.child_frame_id = 'tool0'
-            pose.transform.translation.x = res.current_position[0]
-            pose.transform.translation.y = res.current_position[1]
-            pose.transform.translation.z = res.current_position[2]
+            pose.transform.translation.x = res.current_position[0]/1000.0
+            pose.transform.translation.y = res.current_position[1]/1000.0
+            pose.transform.translation.z = res.current_position[2]/1000.0
         
-            quat = transformations.quaternion_from_euler(res.current_position[3],
-                                                         res.current_position[4],
-                                                         res.current_position[5],)
+            quat = transformations.quaternion_from_euler(res.current_position[3]*3.14/180,
+                                                         res.current_position[4]*3.14/180,
+                                                         res.current_position[5]*3.14/180,axes= "sxyz")
             pose.transform.rotation.x = quat[0]
             pose.transform.rotation.y = quat[1]
             pose.transform.rotation.z = quat[2]
@@ -120,25 +139,25 @@ class HandInEyeCalibration(Node):
 
             self.tf_broadcaster.sendTransform(pose)
 
-            nest_state = States.MOVE_TO_CALI_POSE
+            if self.cali_pose_cnt != 22:
+                nest_state = States.MOVE_TO_CALI_POSE
+            else:
+                nest_state = States.CLOSE_ROBOT
 
         elif state == States.MOVE_TO_CALI_POSE:
-            input()
             self.get_logger().info('MOVE_TO_CALI_POSE')
-            aruco_req = ArucoMarkerInfo()
-            aruco_req.process = True
-            self.call_for_aruco(aruco_req)
+            pose = Twist()
+            [pose.linear.x, pose.linear.y, pose.linear.z] = CALI_POSE[self.cali_pose_cnt][0:3]
+            [pose.angular.x, pose.angular.y, pose.angular.z] = CALI_POSE[self.cali_pose_cnt][3:6]
             req = self.generate_robot_request(
+                cmd_mode=RobotCommand.Request.PTP,
                 cmd_type=RobotCommand.Request.POSE_CMD,
-                joints=CALI_POSE[self.cali_pose_cnt]
+                pose=pose
                 )
             res = self.call_hiwin(req)
             self.cali_pose_cnt += 1
             if res.arm_state == RobotCommand.Response.IDLE:
-                if self.cali_pose_cnt != 22:
-                    nest_state = States.BROADCASTE_POSE
-                else:
-                    nest_state = States.CLOSE_ROBOT
+                nest_state = States.BROADCASTE_POSE
             else:
                 nest_state = None
 

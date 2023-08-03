@@ -20,9 +20,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'strategy_example = hiwin_example.strategy_example:main'
-            'strategy_example = hiwin_example.hand_in_eye_calibration:main'
-            'strategy_example = hiwin_example.three_points_calibration_example:main'
+            'strategy_example = hiwin_example.strategy_example:main',
+            'hand_in_eye_calibration = hiwin_example.hand_in_eye_calibration:main',
+            'three_points_calibration_example = hiwin_example.three_points_calibration_example:main',
         ],
     },
 )
