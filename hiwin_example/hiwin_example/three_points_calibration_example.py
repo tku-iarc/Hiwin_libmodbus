@@ -18,12 +18,6 @@ import numpy as np
 import quaternion as qtn
 from hiwin_example import transformations
 
-from tf2_ros import TransformBroadcaster
-
-from tf2_ros import TransformException
-from tf2_ros.buffer import Buffer
-from tf2_ros.transform_listener import TransformListener
-from geometry_msgs.msg import TransformStamped
 
 DEFAULT_VELOCITY = 20
 DEFAULT_ACCELERATION = 20
@@ -47,7 +41,7 @@ class States(Enum):
     GET_CALI_POINT = 3
     MOVE_TO_CALI_POINT = 4
     CALCULATE_COORDINATE = 5
-    MOVE_TO_PLACE_POSE = 6
+    SET_NEW_BASE = 6
     CHECK_POSE = 7
     CLOSE_ROBOT = 8
 
@@ -64,10 +58,7 @@ class ThreePointsCalibration(Node):
         self.marker_ids = []
         self.cali_pose = []
         self.final_cali_pose = []
-
-        self.tf_buffer = Buffer()
-        self.tf_listener = TransformListener(self.tf_buffer, self)
-        self.tf_broadcaster = TransformBroadcaster(self)
+        self.new_base = []
 
     def _state_machine(self, state: States) -> States:
         if state == States.INIT:
@@ -152,48 +143,25 @@ class ThreePointsCalibration(Node):
 
         elif state == States.CALCULATE_COORDINATE:
             self.get_logger().info('CALCULATE_COORDINATE')
-            self.get_vector()
+            self.new_base = self.get_vector()
             if res.arm_state == RobotCommand.Response.IDLE:
-                nest_state = States.MOVE_TO_PLACE_POSE
+                nest_state = States.SET_NEW_BASE
             else:
                 nest_state = None
 
-        elif state == States.MOVE_TO_PLACE_POSE:
-            self.get_logger().info('MOVE_TO_PLACE_POSE')
+        elif state == States.SET_NEW_BASE:
+            self.get_logger().info('SET_NEW_BASE')
             pose = Twist()
+            [pose.linear.x, pose.linear.y, pose.linear.z] = self.new_base[0:3]
+            [pose.angular.x, pose.angular.y, pose.angular.z] = self.new_base[3:6]
             req = self.generate_robot_request(
-                cmd_type=RobotCommand.Request.JOINTS_CMD,
-                joints=PLACE_POSE,
-                pose=pose)
-            res = self.call_hiwin(req)
-
-            req = self.generate_robot_request(
-                cmd_mode=RobotCommand.Request.DIGITAL_OUTPUT,
-                digital_output_cmd=RobotCommand.Request.DIGITAL_OFF,
-                digital_output_pin=VACUUM_PIN,
-                holding=True,
+                cmd_mode=RobotCommand.Request.SET_BASE,
+                holding=False,
                 pose=pose
             )
             res = self.call_hiwin(req)
-            req = self.generate_robot_request(
-                cmd_mode=RobotCommand.Request.WAITING
-            )
-            res = self.call_hiwin(req)
-            if res.arm_state == RobotCommand.Response.IDLE:
-                nest_state = States.MOVE_TO_PHOTO_POSE
-            else:
-                nest_state = None
+            nest_state = States.CLOSE_ROBOT
 
-        elif state == States.CHECK_POSE:
-            self.get_logger().info('CHECK_POSE')
-            req = self.generate_robot_request(
-                cmd_mode=RobotCommand.Request.CHECK_JOINT)
-            res = self.call_hiwin(req)
-            print(res.current_position)
-            if res.arm_state == RobotCommand.Response.IDLE:
-                nest_state = States.CLOSE_ROBOT
-            else:
-                nest_state = None
 
         elif state == States.CLOSE_ROBOT:
             self.get_logger().info('CLOSE_ROBOT')
@@ -297,10 +265,14 @@ class ThreePointsCalibration(Node):
         tool2cam_mat = np.append(tool2cam_mat, np.array([[0., 0., 0., 1.]]), axis=0)
         # transform_mat = np.linalg.inv(transform_mat)
 
-        base2tool_rot = qtn.as_rotation_matrix(np.quaternion(transform.orientation.w, 
-                                                             transform.orientation.x, 
-                                                             transform.orientation.y, 
-                                                             transform.orientation.z))
+        quat = transformations.quaternion_from_euler(180*3.14/180,
+                                                     0*3.14/180,
+                                                     -90*3.14/180,axes= "sxyz")
+        
+        base2tool_rot = qtn.as_rotation_matrix(np.quaternion(quat[3], 
+                                                             quat[0], 
+                                                             quat[1], 
+                                                             quat[2]))
         base2tool_trans = np.array([[transform.position.x],
                                     [transform.position.y],
                                     [transform.position.z]])
@@ -321,19 +293,21 @@ class ThreePointsCalibration(Node):
         cam2aruco_mat = np.append(cam2aruco_rot, cam2aruco_trans, axis=1)
         cam2aruco_mat = np.append(cam2aruco_mat, np.array([[0., 0., 0., 1.]]), axis=0)
 
-        base2cam_mat = np.matmul(base2tool_rot, cam2tool_mat)
+        base2cam_mat = np.matmul(base2tool_rot, tool2cam_mat)
         base2aruco_mat = np.matmul(base2cam_mat, cam2aruco_mat)
 
 
         ax, ay, az = transformations.euler_from_matrix(base2aruco_mat)
-        base2aruco_translation = transformations.translation_from_matrix(base2aruco_mat)*100.0
+        base2aruco_translation = transformations.translation_from_matrix(base2aruco_mat)*1000.0
         # print(angle[0]*180/pi)
         # print(angle[1]*180/pi)
         # print(angle[2]*180/pi)
         calibrate_pose = [base2aruco_translation[0], 
-                       base2aruco_translation[1], 
-                       base2aruco_translation[2],
-                       ax, ay, az]
+                          base2aruco_translation[1], 
+                          base2aruco_translation[2],
+                          ax*180/3.14, 
+                          ay*180/3.14, 
+                          az*180/3.14]
 
         return calibrate_pose
         # try:
@@ -379,15 +353,15 @@ class ThreePointsCalibration(Node):
         euler_angle = r.as_euler('xyz', degrees=True)
         print(euler_angle)
 
-        NEW_BASE = [new_base_point[0], 
+        new_base = [new_base_point[0], 
                   new_base_point[1], 
                   new_base_point[2], 
                   euler_angle[0], 
                   euler_angle[1], 
                   euler_angle[2]]
-        print(NEW_BASE)
+        print(new_base)
 
-        return NEW_BASE
+        return new_base
 
     def start_calibration_thread(self):
         self.main_loop_thread = Thread(target=self._main_loop)
