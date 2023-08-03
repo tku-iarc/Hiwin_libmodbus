@@ -55,7 +55,7 @@ class ThreePointsCalibration(Node):
 
     def __init__(self):
         super().__init__('three_points_calibration')
-        self.calibration_server = self.create_client(RobotCommand, 
+        self.calibration_server = self.create_client(ArucoMarkerInfo, 
                                                     'calibration_points')
         self.hiwin_client = self.create_client(RobotCommand, 'hiwinmodbus_service')
         self.object_pose = None
@@ -285,16 +285,16 @@ class ThreePointsCalibration(Node):
     def convert_arm_pose(self, aruco_pose):
 
 
-        cam2tool_rot = qtn.as_rotation_matrix(np.quaternion(transform.orientation.w, 
+        tool2cam_rot = qtn.as_rotation_matrix(np.quaternion(transform.orientation.w, 
                                                             transform.orientation.x, 
                                                             transform.orientation.y, 
                                                             transform.orientation.z))
-        cam2tool_trans = np.array([[transform.position.x],
+        tool2cam_trans = np.array([[transform.position.x],
                                    [transform.position.y],
                                    [transform.position.z]])
         
-        cam2tool_mat = np.append(cam2tool_rot, cam2tool_trans, axis=1)
-        cam2tool_mat = np.append(cam2tool_mat, np.array([[0., 0., 0., 1.]]), axis=0)
+        tool2cam_mat = np.append(tool2cam_rot, tool2cam_trans, axis=1)
+        tool2cam_mat = np.append(tool2cam_mat, np.array([[0., 0., 0., 1.]]), axis=0)
         # transform_mat = np.linalg.inv(transform_mat)
 
         base2tool_rot = qtn.as_rotation_matrix(np.quaternion(transform.orientation.w, 
