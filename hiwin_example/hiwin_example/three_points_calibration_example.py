@@ -138,9 +138,14 @@ class ThreePointsCalibration(Node):
                         cmd_mode=RobotCommand.Request.CHECK_POSE)
                     res = self.call_hiwin(req)
                     self.final_cali_pose.append(res.current_position)
-                    nest_state = States.CALCULATE_COORDINATE
+                    req = self.generate_robot_request(
+                        cmd_type=RobotCommand.Request.JOINTS_CMD,
+                        joints=PHOTO_POSE
+                        )
+                    res = self.call_hiwin(req)
                 else:
                     nest_state = None
+            nest_state = States.CALCULATE_COORDINATE
 
         elif state == States.CALCULATE_COORDINATE:
             self.get_logger().info('CALCULATE_COORDINATE')
