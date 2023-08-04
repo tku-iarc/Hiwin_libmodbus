@@ -113,6 +113,7 @@ class ThreePointsCalibration(Node):
             pose = Twist()
             for i in range(len(self.marker_ids)+1):
                 [pose.linear.x, pose.linear.y, pose.linear.z] = self.cali_pose[i][0:3]
+                pose.linear.z = -22.00 #around 10 cm above new surface 
                 [pose.angular.x, pose.angular.y, pose.angular.z] = res.current_position[3:6]
                 # pose.linear.z += 10
                 req = self.generate_robot_request(
@@ -121,7 +122,7 @@ class ThreePointsCalibration(Node):
                 res = self.call_hiwin(req)
                 if res.arm_state == RobotCommand.Response.IDLE:
                     while 1:
-                        pose.linear.z += 0.001
+                        pose.linear.z += 1.0
                         req = self.generate_robot_request(
                             cmd_mode=RobotCommand.Request.LINE,
                             pose=pose)
