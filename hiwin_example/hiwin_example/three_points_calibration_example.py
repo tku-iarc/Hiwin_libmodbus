@@ -24,7 +24,10 @@ DEFAULT_ACCELERATION = 20
 
 VACUUM_PIN = 3
 
-PHOTO_POSE = [0.00, 0.00, 0.00, 0.00, -90.00, 0.00]
+# PHOTO_POSE = [0.00, 0.00, 0.00, 0.00, -90.00, 0.00]
+# PHOTO_POSE = [23.941, 30.768, -21.553, 0.00, -99.215, 23.941]
+# PHOTO_POSE = [31.536, 11.962, -9.729, 0.001, -92.2233, -55.906]
+PHOTO_POSE = [33.957, 10.637, -8.891, -8.371, -97.299, -54.148]
 # OBJECT_POSE = [20.00, 0.00, 0.00, 0.00, -90.00, 0.00]
 OBJECT_POSE = [-67.517, 361.753, 293.500, 180.00, 0.00, 100.572]
 PLACE_POSE = [-20.00, 0.00, 0.00, 0.00, -90.00, 0.00]
@@ -49,7 +52,7 @@ class ThreePointsCalibration(Node):
 
     def __init__(self):
         super().__init__('three_points_calibration')
-        self.calibration_server = self.create_client(ArucoMarkerInfo, 
+        self.calibration_client = self.create_client(ArucoMarkerInfo, 
                                                     'calibration_points')
         self.hiwin_client = self.create_client(RobotCommand, 'hiwinmodbus_service')
         self.object_pose = None
@@ -80,19 +83,29 @@ class ThreePointsCalibration(Node):
 
         elif state == States.GET_CALI_POINT:
             self.get_logger().info('GET_CALI_POINT')
-            aruco_req = ArucoMarkerInfo()
+            aruco_req = ArucoMarkerInfo.Request()
             aruco_req.process = True
-            self.call_for_aruco(aruco_req)
-            if len(res.markers) != 0:
-                self.marker_ids = res.markers.marker_ids
-                for i in range(len(res.markers)):
+            res = self.call_for_aruco(aruco_req)
+            if len(res.marker_ids) != 0:
+                self.marker_ids = res.marker_ids
+                for i in range(len(res.marker_ids)):
                     # self.cali_points = len(res.markers)
-                    cali_pose = self.convert_arm_pose(res.markers.poses[i])
-                    if res.markers[0] == 1:
-                        self.cali_pose.append(cali_pose)
-                    else:
-                        self.cali_pose.insert(0, cali_pose)
-                    self.cali_pose.append(cali_pose+[0.0, 150.0, 0.0])
+                    cali_pose = self.convert_arm_pose(res.poses[i])
+                    self.cali_pose.append(cali_pose)
+                if res.marker_ids[0] == 1: 
+                    extend = [533.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+                    extend_cali_pose = [self.cali_pose[0][x] + extend[x] for x in range(len(self.cali_pose[0]))]
+                    print(extend_cali_pose)
+                    self.cali_pose.insert(1, extend_cali_pose)
+                    # extend_cali_pose = cali_pose
+                else:
+                    extend = [533.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+                    extend_cali_pose = [self.cali_pose[1][x] + extend[x] for x in range(len(self.cali_pose[1]))]
+                    print(extend_cali_pose)
+                    self.cali_pose.insert(0, extend_cali_pose)
+                    self.cali_pose.insert(0, self.cali_pose[2])
+                    self.cali_pose.pop(3)
+                # self.cali_pose.insert(1, cali_pose)
                 # self.object_pose = res.pose_array
                 nest_state = States.MOVE_TO_CALI_POINT
             else:
@@ -111,31 +124,45 @@ class ThreePointsCalibration(Node):
                 cmd_mode=RobotCommand.Request.CHECK_POSE)
             res = self.call_hiwin(req)
             pose = Twist()
-            for i in range(len(self.marker_ids)+1):
+            print(self.cali_pose)
+            input()
+            [pose.angular.x, pose.angular.y, pose.angular.z] = res.current_position[3:6]
+            for i in range(len(self.cali_pose)):
                 [pose.linear.x, pose.linear.y, pose.linear.z] = self.cali_pose[i][0:3]
-                pose.linear.z = -22.00 #around 10 cm above new surface 
-                [pose.angular.x, pose.angular.y, pose.angular.z] = res.current_position[3:6]
+                pose.angular.y = 0.0
+                # [pose.linear.x, pose.linear.y, pose.linear.z] = [180.0, 0.0, 90.0]
+                pose.linear.z = -102.00 #around 10 cm above new surface 
                 # pose.linear.z += 10
                 req = self.generate_robot_request(
                     cmd_mode=RobotCommand.Request.PTP,
                     pose=pose)
                 res = self.call_hiwin(req)
                 if res.arm_state == RobotCommand.Response.IDLE:
+                    input()
                     while 1:
-                        pose.linear.z += 1.0
+                        pose.linear.z -= 1.0
                         req = self.generate_robot_request(
-                            cmd_mode=RobotCommand.Request.LINE,
-                            pose=pose)
+                            cmd_mode=RobotCommand.Request.PTP,
+                            pose=pose,
+                            holding=True)
                         res = self.call_hiwin(req)
                         req = self.generate_robot_request(
                             cmd_mode=RobotCommand.Request.READ_DI,
-                            digital_input_pin=3,
+                            digital_input_pin=1,
                             holding=False)
                         res = self.call_hiwin(req)
+                        print(res.digital_state)
                         if res.digital_state:
                             break
+                            # req = self.generate_robot_request(
+                            #     cmd_mode=RobotCommand.Request.PTP,
+                            #     pose=pose,
+                            #     holding=True)
+                            # res = self.call_hiwin(req)
+                            # if res.arm_state == RobotCommand.Response.IDLE: 
+                            #     break
                     req = self.generate_robot_request(
-                        cmd_mode=RobotCommand.Request.CHECK_POSE)
+                        cmd_mode=RobotCommand.Request.CHECK_POSE, holding=False)
                     res = self.call_hiwin(req)
                     self.final_cali_pose.append(res.current_position)
                     req = self.generate_robot_request(
@@ -143,17 +170,12 @@ class ThreePointsCalibration(Node):
                         joints=PHOTO_POSE
                         )
                     res = self.call_hiwin(req)
-                else:
-                    nest_state = None
             nest_state = States.CALCULATE_COORDINATE
 
         elif state == States.CALCULATE_COORDINATE:
             self.get_logger().info('CALCULATE_COORDINATE')
             self.new_base = self.get_vector()
-            if res.arm_state == RobotCommand.Response.IDLE:
-                nest_state = States.SET_NEW_BASE
-            else:
-                nest_state = None
+            nest_state = States.SET_NEW_BASE
 
         elif state == States.SET_NEW_BASE:
             self.get_logger().info('SET_NEW_BASE')
@@ -207,6 +229,8 @@ class ThreePointsCalibration(Node):
             acceleration=DEFAULT_ACCELERATION,
             tool=1,
             base=0,
+            base_num = 30,
+            tool_num = 30,
             digital_input_pin=0,
             digital_output_pin=0,
             digital_output_cmd=RobotCommand.Request.DIGITAL_OFF,
@@ -226,6 +250,8 @@ class ThreePointsCalibration(Node):
         request.velocity = velocity
         request.tool = tool
         request.base = base
+        request.tool_num = tool_num
+        request.base_num = base_num
         request.cmd_mode = cmd_mode
         request.cmd_type = cmd_type
         request.circ_end = circ_end
@@ -247,9 +273,9 @@ class ThreePointsCalibration(Node):
         return res
 
     def call_for_aruco(self, req):
-        while not self.calibration_server.wait_for_service(timeout_sec=2.0):
+        while not self.calibration_client.wait_for_service(timeout_sec=2.0):
             self.get_logger().info('service not available, waiting again...')
-        future = self.calibration_server.call_async(req)
+        future = self.calibration_client.call_async(req)
         if self._wait_for_future_done(future):
             res = future.result()
         else:
@@ -258,30 +284,29 @@ class ThreePointsCalibration(Node):
 
     def convert_arm_pose(self, aruco_pose):
 
-
-        tool2cam_rot = qtn.as_rotation_matrix(np.quaternion(transform.orientation.w, 
-                                                            transform.orientation.x, 
-                                                            transform.orientation.y, 
-                                                            transform.orientation.z))
-        tool2cam_trans = np.array([[transform.position.x],
-                                   [transform.position.y],
-                                   [transform.position.z]])
+        tool2cam_rot = qtn.as_rotation_matrix(np.quaternion(0.6652137475648564, 
+                                                            0.06416339673566386, 
+                                                            0.055456378048947444, 
+                                                            0.7418209478733756))
+        tool2cam_trans = np.array([[0.043391017155379435],
+                                   [-0.026173164350163244],
+                                   [0.02090378531071043]])
         
         tool2cam_mat = np.append(tool2cam_rot, tool2cam_trans, axis=1)
         tool2cam_mat = np.append(tool2cam_mat, np.array([[0., 0., 0., 1.]]), axis=0)
         # transform_mat = np.linalg.inv(transform_mat)
 
-        quat = transformations.quaternion_from_euler(180*3.14/180,
-                                                     0*3.14/180,
-                                                     -90*3.14/180,axes= "sxyz")
+        quat = transformations.quaternion_from_euler(179.541*3.14/180,
+                                                     10.010*3.14/180,
+                                                     177.402*3.14/180,axes= "sxyz")
         
         base2tool_rot = qtn.as_rotation_matrix(np.quaternion(quat[3], 
                                                              quat[0], 
                                                              quat[1], 
                                                              quat[2]))
-        base2tool_trans = np.array([[transform.position.x],
-                                    [transform.position.y],
-                                    [transform.position.z]])
+        base2tool_trans = np.array([[-0.154678],
+                                    [0.252052],
+                                    [0.299256]])
         
         base2tool_mat = np.append(base2tool_rot, base2tool_trans, axis=1)
         base2tool_mat = np.append(base2tool_mat, np.array([[0., 0., 0., 1.]]), axis=0)
@@ -299,7 +324,7 @@ class ThreePointsCalibration(Node):
         cam2aruco_mat = np.append(cam2aruco_rot, cam2aruco_trans, axis=1)
         cam2aruco_mat = np.append(cam2aruco_mat, np.array([[0., 0., 0., 1.]]), axis=0)
 
-        base2cam_mat = np.matmul(base2tool_rot, tool2cam_mat)
+        base2cam_mat = np.matmul(base2tool_mat, tool2cam_mat)
         base2aruco_mat = np.matmul(base2cam_mat, cam2aruco_mat)
 
 
@@ -335,7 +360,6 @@ class ThreePointsCalibration(Node):
         # else:
         #     new_base_point = self.final_cali_pose[1][0:3]
         #     x_extend_point = self.final_cali_pose[0][0:3]
-
         new_base_point = self.final_cali_pose[0][0:3]
         x_extend_point = self.final_cali_pose[1][0:3]
         third_point = self.final_cali_pose[2][0:3]
@@ -347,7 +371,7 @@ class ThreePointsCalibration(Node):
         Vector_other = third_point - new_base_point    # base and other 兩點向量
         Vector_Z = np.cross(Vector_X, Vector_other) # 外積出Z軸向量
         # print(Vector_AZ)
-        Vector_Y = np.cross(Vector_X, Vector_Z)  # 外積出Y軸向量
+        Vector_Y = np.cross(Vector_Z, Vector_X)  # 外積出Y軸向量
         # print(Vector_AY)
 
         vx = Vector_X / np.linalg.norm(Vector_X)    # 轉成單位向量
@@ -358,6 +382,9 @@ class ThreePointsCalibration(Node):
         r = R.from_matrix(Transpose)
         euler_angle = r.as_euler('xyz', degrees=True)
         print(euler_angle)
+        # euler_angle[0] = 0 - euler_angle[0]
+        # euler_angle[1] = 0 - euler_angle[1] 
+        # euler_angle[2] = 90 - euler_angle[2]
 
         new_base = [new_base_point[0], 
                   new_base_point[1], 

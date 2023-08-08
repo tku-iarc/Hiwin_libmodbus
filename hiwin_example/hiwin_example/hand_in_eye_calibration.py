@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import time
-import keyboard
 import rclpy
 from enum import Enum
 from threading import Thread
@@ -137,7 +136,9 @@ class HandInEyeCalibration(Node):
             pose.transform.rotation.z = quat[2]
             pose.transform.rotation.w = quat[3]
 
-            self.tf_broadcaster.sendTransform(pose)
+            # self.tf_broadcaster.sendTransform(pose)
+            self.tf_static_broadcaster.sendTransform(pose)
+            input()
 
             if self.cali_pose_cnt != 22:
                 nest_state = States.MOVE_TO_CALI_POSE
