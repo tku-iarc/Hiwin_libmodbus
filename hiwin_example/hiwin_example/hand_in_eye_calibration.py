@@ -41,28 +41,51 @@ PLACE_POSE = [-20.00, 0.00, 0.00, 0.00, -90.00, 0.00]
 NUM_OBJECTS = 5
 
 
-CALI_POSE = [[0.0, 368.0, 293.5, -180.0, 0.0, 90.0],
-[169.087, 367.999, 293.499, 179.999, 0.0, 89.999],
-[-124.949, 367.999, 293.499, -179.999, 0.0, 89.999],
-[-124.95, 389.112, 293.5, -179.999, 0.0, 89.999],
-[-6.375, 343.099, 293.499, -179.999, 0.0, 114.776],
-[11.587, 345.349, 293.5, -179.999, 0.0, 141.454],
-[43.537, 350.037, 293.499, 178.254, 15.194, 173.366],
-[43.537, 491.112, 293.499, 178.254, 15.194, 173.366],
-[-67.059, 549.197, 293.109, 178.246, 15.183, 173.348],
-[-67.059, 475.135, 293.109, 178.246, 15.183, 43.696],
-[-126.309, 514.613, 290.709, 178.246, 15.183, 43.696],
-[47.54, 512.325, 290.71, 178.246, 15.183, 10.671],
-[127.938, 500.858, 221.335, 174.706, 29.131, 76.06],
-[-113.189, 465.175, 238.726, 153.091, 17.557, 68.415],
-[-19.107, 484.406, 222.025, 162.894, 14.341, 16.293],
-[-14.25, 255.246, 159.015, 178.03, -17.123, 89.891],
-[-14.25, 255.246, 93.877, 178.03, -17.123, 89.891],
-[-14.195, 431.346, 78.277, -179.687, 13.316, 89.095],
-[-14.195, 431.346, 167.19, -179.746, 16.908, 89.079],
-[94.141, 504.729, 167.19, -179.746, 16.908, 89.079],
-[140.191, 504.729, 167.19, -179.746, 16.908, 89.079],
-[-63.208, 386.342, 167.19, 158.774, 2.216, 88.169]]
+# CALI_POSE = [[0.0, 368.0, 293.5, -180.0, 0.0, 90.0],
+# [169.087, 367.999, 293.499, 179.999, 0.0, 89.999],
+# [-124.949, 367.999, 293.499, -179.999, 0.0, 89.999],
+# [-124.95, 389.112, 293.5, -179.999, 0.0, 89.999],
+# [-6.375, 343.099, 293.499, -179.999, 0.0, 114.776],
+# [11.587, 345.349, 293.5, -179.999, 0.0, 141.454],
+# [43.537, 350.037, 293.499, 178.254, 15.194, 173.366],
+# [43.537, 491.112, 293.499, 178.254, 15.194, 173.366],
+# [-67.059, 549.197, 293.109, 178.246, 15.183, 173.348],
+# [-67.059, 475.135, 293.109, 178.246, 15.183, 43.696],
+# [-126.309, 514.613, 290.709, 178.246, 15.183, 43.696],
+# [47.54, 512.325, 290.71, 178.246, 15.183, 10.671],
+# [127.938, 500.858, 221.335, 174.706, 29.131, 76.06],
+# [-113.189, 465.175, 238.726, 153.091, 17.557, 68.415],
+# [-19.107, 484.406, 222.025, 162.894, 14.341, 16.293],
+# [-14.25, 255.246, 159.015, 178.03, -17.123, 89.891],
+# [-14.25, 255.246, 93.877, 178.03, -17.123, 89.891],
+# [-14.195, 431.346, 78.277, -179.687, 13.316, 89.095],
+# [-14.195, 431.346, 167.19, -179.746, 16.908, 89.079],
+# [94.141, 504.729, 167.19, -179.746, 16.908, 89.079],
+# [140.191, 504.729, 167.19, -179.746, 16.908, 89.079],
+# [-63.208, 386.342, 167.19, 158.774, 2.216, 88.169]]
+
+CALI_POSE = [[0.007, 263.428, 391.844, 180.00, 0.001, 90.005],
+[0.007, 352.378, 404.294, 168.131, 7.113, 120.499],
+[-63.993, 333.653, 369.019, 167.330, 5.759, 120.410],
+[-157.018, 166.154, 376.794, 172.696, -19.854, 65.773],
+[-134.491, 246.855, 351.001, 169.822, -9.550, 76.023],
+[152.008, 246.855, 351.001, -168.296, -3.551, 73.493],
+[152.008, 165.656, 295.376, -168.296, -3.551, 73.493],
+[152.008, 256.106, 295.376, -168.296, -3.551, 82.508],
+[152.008, 182.731, 342.876, 179.786, -13.750, 85.316],
+[-124.168, 156.086, 336.456, -177.508, -19.986, 66.950],
+[-155.442, 132.711, 354.206, 177.304, -21.957, 82.938],
+[-135.821, 239.421, 335.577, 166.819, -2.966, 88.823],
+[-135.821, 417.221, 297.202, 164.637, 8.514, 86.776],
+[-34.446, 417.221, 280.027, 164.419, 12.298, 86.737],
+[-34.446, 417.221, 280.027, 164.419, 12.298, 103.352],
+[0.00, 332.075, 224.8, -180.0, 0.00, 90.00],
+[0.00, 236.900, 176.425, -172.255, -13.649, 88.162],
+[109.250, 236.900, 176.425, -162.757, -10.963, 86.316],
+[109.250, 282.200, 248.200, -161.409, -0.387, 97.172],
+[-39.950, 282.200, 265.750, -166.631, 0.070, 52.833],
+[-150.675, 337.775, 265.750, 167.786, 7.941, 90.605],
+[0.00, 368.000, 293.500, -180.0, 0.00, 90.0]]
 
 
 class States(Enum):
@@ -92,22 +115,22 @@ class HandInEyeCalibration(Node):
         if state == States.INIT:
             self.get_logger().info('INIT')
             
-            # t = TransformStamped()
+            t = TransformStamped()
 
-            # t.header.stamp = self.get_clock().now().to_msg()
-            # t.header.frame_id = 'world'
-            # t.child_frame_id = 'base_link'
+            t.header.stamp = self.get_clock().now().to_msg()
+            t.header.frame_id = 'world'
+            t.child_frame_id = 'base_link'
 
-            # t.transform.translation.x = 0.0
-            # t.transform.translation.y = 0.0
-            # t.transform.translation.z = 0.0
+            t.transform.translation.x = 0.0
+            t.transform.translation.y = 0.0
+            t.transform.translation.z = 0.0
             
-            # t.transform.rotation.x = 0.0
-            # t.transform.rotation.y = 0.0
-            # t.transform.rotation.z = 0.0
-            # t.transform.rotation.w = 1.0
+            t.transform.rotation.x = 0.0
+            t.transform.rotation.y = 0.0
+            t.transform.rotation.z = 0.0
+            t.transform.rotation.w = 1.0
 
-            # self.tf_static_broadcaster.sendTransform(t)
+            self.tf_static_broadcaster.sendTransform(t)
 
             nest_state = States.BROADCASTE_POSE
 
@@ -116,7 +139,7 @@ class HandInEyeCalibration(Node):
             pose = Twist()
             req = self.generate_robot_request(
                 cmd_mode=RobotCommand.Request.CHECK_POSE,
-                holding=False
+                holding=True
                 )
             res = self.call_hiwin(req)
 
@@ -139,7 +162,9 @@ class HandInEyeCalibration(Node):
             # self.tf_broadcaster.sendTransform(pose)
             self.tf_static_broadcaster.sendTransform(pose)
             input()
+            
 
+            nest_state = States.MOVE_TO_CALI_POSE
             if self.cali_pose_cnt != 22:
                 nest_state = States.MOVE_TO_CALI_POSE
             else:
@@ -153,14 +178,49 @@ class HandInEyeCalibration(Node):
             req = self.generate_robot_request(
                 cmd_mode=RobotCommand.Request.PTP,
                 cmd_type=RobotCommand.Request.POSE_CMD,
-                pose=pose
+                pose=pose,
+                holding=True,
                 )
             res = self.call_hiwin(req)
+            
+            req = self.generate_robot_request(
+                cmd_mode=RobotCommand.Request.CHECK_POSE,
+                holding=True
+                )
+            res = self.call_hiwin(req)
+
+            pose = TransformStamped()
+            pose.header.stamp = self.get_clock().now().to_msg()
+            pose.header.frame_id = 'base_link'
+            pose.child_frame_id = 'tool0'
+            pose.transform.translation.x = res.current_position[0]/1000.0
+            pose.transform.translation.y = res.current_position[1]/1000.0
+            pose.transform.translation.z = res.current_position[2]/1000.0
+        
+            quat = transformations.quaternion_from_euler(res.current_position[3]*3.14/180,
+                                                         res.current_position[4]*3.14/180,
+                                                         res.current_position[5]*3.14/180,axes= "sxyz")
+            pose.transform.rotation.x = quat[0]
+            pose.transform.rotation.y = quat[1]
+            pose.transform.rotation.z = quat[2]
+            pose.transform.rotation.w = quat[3]
+
+            self.tf_static_broadcaster.sendTransform(pose)
+            cn = 0 
+            # while 1:
+            #     cn += 1
+            #     self.tf_broadcaster.sendTransform(pose)
+            #     if cn == 10000:
+            #         break
+            # self.tf_static_broadcaster.sendTransform(pose)
             self.cali_pose_cnt += 1
             if res.arm_state == RobotCommand.Response.IDLE:
                 nest_state = States.BROADCASTE_POSE
-            else:
-                nest_state = None
+            # if self.cali_pose_cnt != 22:
+            #     nest_state = States.MOVE_TO_CALI_POSE
+            # else:
+            #     nest_state = States.CLOSE_ROBOT
+
 
         elif state == States.CLOSE_ROBOT:
             self.get_logger().info('CLOSE_ROBOT')
@@ -242,7 +302,7 @@ class HandInEyeCalibration(Node):
 
     def start_calibration_thread(self):
         self.main_loop_thread = Thread(target=self._main_loop)
-        self.main_loop_thread.daemon = True
+        self.main_loop_thread.daemon = False
         self.main_loop_thread.start()
 
 

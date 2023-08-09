@@ -93,13 +93,13 @@ class ThreePointsCalibration(Node):
                     cali_pose = self.convert_arm_pose(res.poses[i])
                     self.cali_pose.append(cali_pose)
                 if res.marker_ids[0] == 1: 
-                    extend = [533.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+                    extend = [333.0, 100.0, 0.0, 0.0, 0.0, 0.0]
                     extend_cali_pose = [self.cali_pose[0][x] + extend[x] for x in range(len(self.cali_pose[0]))]
                     print(extend_cali_pose)
                     self.cali_pose.insert(1, extend_cali_pose)
                     # extend_cali_pose = cali_pose
                 else:
-                    extend = [533.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+                    extend = [333.0, 100.0, 0.0, 0.0, 0.0, 0.0]
                     extend_cali_pose = [self.cali_pose[1][x] + extend[x] for x in range(len(self.cali_pose[1]))]
                     print(extend_cali_pose)
                     self.cali_pose.insert(0, extend_cali_pose)
@@ -284,13 +284,13 @@ class ThreePointsCalibration(Node):
 
     def convert_arm_pose(self, aruco_pose):
 
-        tool2cam_rot = qtn.as_rotation_matrix(np.quaternion(0.6652137475648564, 
-                                                            0.06416339673566386, 
-                                                            0.055456378048947444, 
-                                                            0.7418209478733756))
-        tool2cam_trans = np.array([[0.043391017155379435],
-                                   [-0.026173164350163244],
-                                   [0.02090378531071043]])
+        tool2cam_rot = qtn.as_rotation_matrix(np.quaternion(0.7125837211212719, 
+                                                            0.057922414425112104, 
+                                                            0.06228355517128741, 
+                                                            0.6964123728476915))
+        tool2cam_trans = np.array([[0.052621243974348364],
+                                   [-0.034988275026345314],
+                                   [0.021526126415032727]])
         
         tool2cam_mat = np.append(tool2cam_rot, tool2cam_trans, axis=1)
         tool2cam_mat = np.append(tool2cam_mat, np.array([[0., 0., 0., 1.]]), axis=0)
@@ -351,32 +351,43 @@ class ThreePointsCalibration(Node):
         #     self.get_logger().info(
         #         f'Could not transform base to ar_marker: {ex}')
         #     return
-    def get_vector(self):
+    def get_vector(self, axis = "yx"):
         #
-        # self.final_cali_pose[0][0:3]
-        # if self.marker_ids[0] == 1:
-        #     new_base_point = self.final_cali_pose[0][0:3]
-        #     x_extend_point = self.final_cali_pose[1][0:3]
-        # else:
-        #     new_base_point = self.final_cali_pose[1][0:3]
-        #     x_extend_point = self.final_cali_pose[0][0:3]
-        new_base_point = self.final_cali_pose[0][0:3]
-        x_extend_point = self.final_cali_pose[1][0:3]
-        third_point = self.final_cali_pose[2][0:3]
-        new_base_point = np.array(new_base_point)
-        x_extend_point = np.array(x_extend_point)
-        third_point = np.array(third_point)
-        
-        Vector_X = x_extend_point - new_base_point     # X軸向量
-        Vector_other = third_point - new_base_point    # base and other 兩點向量
-        Vector_Z = np.cross(Vector_X, Vector_other) # 外積出Z軸向量
-        # print(Vector_AZ)
-        Vector_Y = np.cross(Vector_Z, Vector_X)  # 外積出Y軸向量
-        # print(Vector_AY)
+        if axis == "xy":
+            new_base_point = self.final_cali_pose[0][0:3]
+            x_extend_point = self.final_cali_pose[1][0:3]
+            third_point = self.final_cali_pose[2][0:3]
+            new_base_point = np.array(new_base_point)
+            x_extend_point = np.array(x_extend_point)
+            third_point = np.array(third_point)
+
+            Vector_X = x_extend_point - new_base_point     # X軸向量
+            Vector_other = third_point - new_base_point    # base and other 兩點向量
+            Vector_Z = np.cross(Vector_X, Vector_other) # 外積出Z軸向量
+            # print(Vector_AZ)
+            Vector_Y = np.cross(Vector_Z, Vector_X)  # 外積出Y軸向量
+            # print(Vector_AY)
+
+        elif axis == "yx":
+
+            new_base_point = self.final_cali_pose[0][0:3]
+            y_point = self.final_cali_pose[2][0:3]
+            third_point = self.final_cali_pose[1][0:3]
+            new_base_point = np.array(new_base_point)
+            y_point = np.array(y_point)
+            third_point = np.array(third_point)
+
+            Vector_Y =  y_point - new_base_point      # Y軸向量
+            Vector_other = third_point - new_base_point   # base and other 兩點向量
+            Vector_Z = np.cross(Vector_other, Vector_Y) # 外積出Z軸向量
+            # print(Vector_AZ)
+            Vector_X = np.cross(Vector_Y, Vector_Z)  # 外積出X軸向量
+            # print(Vector_AY)
 
         vx = Vector_X / np.linalg.norm(Vector_X)    # 轉成單位向量
         vy = Vector_Y / np.linalg.norm(Vector_Y)
         vz = Vector_Z / np.linalg.norm(Vector_Z)
+
 
         Transpose = np.array([vx, vy, vz]).T
         r = R.from_matrix(Transpose)
