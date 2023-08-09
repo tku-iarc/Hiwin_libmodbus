@@ -131,8 +131,7 @@ class ThreePointsCalibration(Node):
                 [pose.linear.x, pose.linear.y, pose.linear.z] = self.cali_pose[i][0:3]
                 pose.angular.y = 0.0
                 # [pose.linear.x, pose.linear.y, pose.linear.z] = [180.0, 0.0, 90.0]
-                # pose.linear.z = -102.00 #around 2 cm above new surface 
-                pose.linear.z = +102.00
+                pose.linear.z = -102.00 #around 10 cm above new surface 
                 # pose.linear.z += 10
                 req = self.generate_robot_request(
                     cmd_mode=RobotCommand.Request.PTP,
@@ -140,19 +139,13 @@ class ThreePointsCalibration(Node):
                 res = self.call_hiwin(req)
                 if res.arm_state == RobotCommand.Response.IDLE:
                     input()
-                    pose.linear.z = -52.00
-                    req = self.generate_robot_request(
-                        cmd_mode=RobotCommand.Request.LINE,
-                        pose=pose,
-                        holding=False)
-                    res = self.call_hiwin(req)
                     while 1:
-                        # pose.linear.z -= 1.0
-                        # req = self.generate_robot_request(
-                        #     cmd_mode=RobotCommand.Request.LINE,
-                        #     pose=pose,
-                        #     holding=True)
-                        # res = self.call_hiwin(req)
+                        pose.linear.z -= 1.0
+                        req = self.generate_robot_request(
+                            cmd_mode=RobotCommand.Request.PTP,
+                            pose=pose,
+                            holding=True)
+                        res = self.call_hiwin(req)
                         req = self.generate_robot_request(
                             cmd_mode=RobotCommand.Request.READ_DI,
                             digital_input_pin=1,
@@ -160,10 +153,6 @@ class ThreePointsCalibration(Node):
                         res = self.call_hiwin(req)
                         print(res.digital_state)
                         if res.digital_state:
-                            req = self.generate_robot_request(
-                                cmd_mode=RobotCommand.Request.MOTION_STOP,
-                                holding=False)
-                            res = self.call_hiwin(req)
                             break
                             # req = self.generate_robot_request(
                             #     cmd_mode=RobotCommand.Request.PTP,
