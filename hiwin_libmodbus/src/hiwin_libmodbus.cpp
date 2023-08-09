@@ -542,4 +542,20 @@ void HiwinLibmodbus::SET_TOOL(uint16_t tool_num, const double *POSE){
   wrt_ = modbus_write_registers(ctx_, REGISTERS_ADDRESS, 14, table);
   wrt_ = modbus_write_register(ctx_, 200, 1);
 }
+
+void HiwinLibmodbus::Motion_Stop(){
+  // double Angle[6] = {joint1, joint2, joint3, joint4, joint5, joint6};
+  // TODO: the arguments should be defined, 
+  // number can't be directly written here, people will confused what it is.
+
+  uint16_t table[2] = {0, 006};
+
+  /*********************** test ***********************/
+  // uint16_t table[26] = {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  //                       vel, acc, TOOL, BASE, 0, 0, 0, 0, 0, 0, 0, 0};
+  /*********************** test ***********************/
+
+  wrt_ = modbus_write_registers(ctx_, REGISTERS_ADDRESS, 2, table);
+  wrt_ = modbus_write_register(ctx_, 200, 1);
+}
 // }  // namespace hiwin_libmodbus

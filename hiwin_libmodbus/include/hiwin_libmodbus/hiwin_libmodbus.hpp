@@ -92,6 +92,8 @@ public:
   void SET_TOOL(uint16_t tool_num, const std::vector<double> POSE);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void SET_TOOL(uint16_t tool_num, const double *POSE);
+  HIWIN_LIBMODBUS_PUBLIC_TYPE
+  void Motion_Stop();
   
 
   int qqq{0};

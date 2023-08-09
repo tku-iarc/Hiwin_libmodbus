@@ -15,6 +15,7 @@ uint8 WAITING=11
 uint8 READ_DI=12
 uint8 SET_BASE=13
 uint8 SET_TOOL=14
+uint8 MOTION_STOP=15
 
 
 # cmd type

@@ -138,6 +138,10 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
                 hiwinlibmodbus.SET_TOOL(request->tool_num, command);
                 request->holding == false;
             }
+            else if (request->cmd_mode == 15){
+                hiwinlibmodbus.Motion_Stop();
+                request->holding == false;
+            }
             if (request->holding == true){
                 while(1){
                     hiwinlibmodbus.Arm_State_REGISTERS(arm_state); // return arm_state
