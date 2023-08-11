@@ -3,6 +3,7 @@
 #include <memory>
 #include <thread>
 #include <vector>
+#include <chrono>
 
 #include "hiwin_interfaces/srv/robot_command.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -25,6 +26,11 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
 
     }
 
+    static void DO_Timer(int digital_output, int time) {
+        std::cout<<"waiting";
+        std::this_thread::sleep_for(std::chrono::milliseconds(time));
+        hiwinlibmodbus.DO(digital_output, 0);
+    };
     private:
                 
         int arm_state;
@@ -91,7 +97,12 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
               **********************************/
             else if (request->cmd_mode == 5){
                 digital_output =request->digital_output_pin+299;
-                hiwinlibmodbus.DO(digital_output, request->digital_output_cmd);  
+                hiwinlibmodbus.DO(digital_output, request->digital_output_cmd); 
+                if (request->do_timer!=0){
+                    std::thread t(&HiwinlibmodbusServiceServer::DO_Timer, digital_output, request->do_timer);
+                    t.detach(); 
+                }
+                request->holding == false;
             }
         /*********************
           value   joint 
@@ -143,6 +154,7 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
                 request->holding == false;
             }
             if (request->holding == true){
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
                 while(1){
                     hiwinlibmodbus.Arm_State_REGISTERS(arm_state); // return arm_state
                     // int arm_state = hiwinlibmodbus.Check_Arm_State();
@@ -162,6 +174,7 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
 };
 
 
+
 int main(int argc, char **argv)
 {
   rclcpp::init(argc, argv);
@@ -169,7 +182,7 @@ int main(int argc, char **argv)
   hiwinlibmodbus.libModbus_Connect("192.168.0.1");
   hiwinlibmodbus.Holding_Registers_init();
 
-  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Ready to recieve commands.");                 
+  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Ready to recieve commands.");
 
   rclcpp::spin(std::make_shared<HiwinlibmodbusServiceServer>());
   // rclcpp::shutdown();
