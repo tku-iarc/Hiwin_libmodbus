@@ -28,7 +28,7 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
 
     static void DO_Timer(int digital_output, int time) {
         std::cout<<"waiting";
-        std::this_thread::sleep_for(std::chrono::milliseconds(time));
+        std::this_thread::sleep_for(std::chrono::milliseconds(time*1000));
         hiwinlibmodbus.DO(digital_output, 0);
     };
     private:
