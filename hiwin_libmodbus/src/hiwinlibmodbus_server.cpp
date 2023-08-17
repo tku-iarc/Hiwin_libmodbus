@@ -26,11 +26,11 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
 
     }
 
-    static void DO_Timer(int digital_output, int time) {
-        std::cout<<"waiting";
-        std::this_thread::sleep_for(std::chrono::milliseconds(time*1000));
-        hiwinlibmodbus.DO(digital_output, 0);
-    };
+    // static void DO_Timer(int digital_output, int time) {
+    //     std::cout<<"waiting";
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(time*100));
+    //     hiwinlibmodbus.DO(digital_output, 0);
+    // };
     private:
                 
         int arm_state;
@@ -41,6 +41,12 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
         int digital_output;
         // std::array<double, 6> command;
         // double command[6];
+        void DO_Timer(int digital_output, int time) {
+            std::cout<<"waiting";
+            std::this_thread::sleep_for(std::chrono::milliseconds(time*100));
+            hiwinlibmodbus.DO(digital_output, 0);
+        };
+
         rclcpp::Service<hiwin_interfaces::srv::RobotCommand>::SharedPtr server_;
         void hiwinmodbus_execute(const std::shared_ptr<hiwin_interfaces::srv::RobotCommand::Request> request,    
                   std::shared_ptr<hiwin_interfaces::srv::RobotCommand::Response>     response)  
@@ -99,7 +105,7 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
                 digital_output =request->digital_output_pin+299;
                 hiwinlibmodbus.DO(digital_output, request->digital_output_cmd); 
                 if (request->do_timer!=0){
-                    std::thread t(&HiwinlibmodbusServiceServer::DO_Timer, digital_output, request->do_timer);
+                    std::thread t(&HiwinlibmodbusServiceServer::DO_Timer, this, digital_output, request->do_timer);
                     t.detach(); 
                 }
                 request->holding == false;
