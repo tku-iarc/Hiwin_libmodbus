@@ -22,11 +22,11 @@ def generate_launch_description():
         'hiwin_example'), "launch", "cam.rviz")
 
     return LaunchDescription([
-        # IncludeLaunchDescription(
-        #     PythonLaunchDescriptionSource([get_package_share_directory('realsense2_camera'), 
-        #                                    '/launch/rs_launch.py']),
-        #     launch_arguments={'rgb_camera.profile': '1920x1080x30'}.items(),
-        # ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([get_package_share_directory('realsense2_camera'), 
+                                           '/launch/rs_launch.py']),
+            launch_arguments={'rgb_camera.profile': '1920x1080x30'}.items(),
+        ),
 
         Node(
             package="rviz2",

@@ -64,17 +64,14 @@ class ThreePointsCalibration(Node):
         self.cali_pose = []
         self.final_cali_pose = []
         self.new_base = []
-        self.declare_parameters(
-            namespace='',
-            parameters=[
-                ('PHOTO_POSE', None),
-                ('camera_intrinsics', None),
-                ('camera_distortion', None),
-                ('tool2cam_quaternion', None),
-                ('tool2cam_trans', None),
-                ('base2tool_quaternion', None),
-                ('base2tool_trans', None),
-            ])
+
+        self.declare_parameter("PHOTO_POSE", None)
+        self.declare_parameter("camera_intrinsics", None)
+        self.declare_parameter("camera_distortion", None)
+        self.declare_parameter("tool2cam_quaternion", None)
+        self.declare_parameter("tool2cam_trans", None)
+        self.declare_parameter("base2tool_quaternion", None)
+        self.declare_parameter("base2tool_trans", None)
         self.photo_pose = self.get_parameter("PHOTO_POSE").get_parameter_value().double_array_value
         self.tool2cam_quaternion = self.get_parameter("tool2cam_quaternion").get_parameter_value().double_array_value
         self.tool2cam_trans = self.get_parameter("tool2cam_trans").get_parameter_value().double_array_value
