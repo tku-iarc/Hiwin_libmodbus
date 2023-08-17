@@ -26,11 +26,6 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
 
     }
 
-    // static void DO_Timer(int digital_output, int time) {
-    //     std::cout<<"waiting";
-    //     std::this_thread::sleep_for(std::chrono::milliseconds(time*100));
-    //     hiwinlibmodbus.DO(digital_output, 0);
-    // };
     private:
                 
         int arm_state;
@@ -38,19 +33,26 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
         std::vector<double> current_pos;
         std::vector<double> command;
         int command_type;
-        int digital_output;
+        int digital_output = 0;
+        std::mutex mutex;
         // std::array<double, 6> command;
         // double command[6];
-        void DO_Timer(int digital_output, int time) {
+        void DO_Timer(int d_o, int time) {
             std::cout<<"waiting";
             std::this_thread::sleep_for(std::chrono::milliseconds(time*100));
-            hiwinlibmodbus.DO(digital_output, 0);
+            digital_output = d_o;
+            std::unique_lock<std::mutex> lock(mutex);
+            if (digital_output){
+                hiwinlibmodbus.DO(digital_output, 0);
+                digital_output = 0;
+            }
         };
 
         rclcpp::Service<hiwin_interfaces::srv::RobotCommand>::SharedPtr server_;
         void hiwinmodbus_execute(const std::shared_ptr<hiwin_interfaces::srv::RobotCommand::Request> request,    
                   std::shared_ptr<hiwin_interfaces::srv::RobotCommand::Response>     response)  
         {
+            std::unique_lock<std::mutex> lock(mutex);
             // std::cout<<request->holding<<std::endl;
             if (request->cmd_mode == 1){
                 hiwinlibmodbus.MOTOR_EXCITE();
@@ -102,10 +104,10 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
                 0 or 65280  -> R/W 
               **********************************/
             else if (request->cmd_mode == 5){
-                digital_output =request->digital_output_pin+299;
-                hiwinlibmodbus.DO(digital_output, request->digital_output_cmd); 
+                const int d_o = request->digital_output_pin+299;
+                hiwinlibmodbus.DO(d_o, request->digital_output_cmd); 
                 if (request->do_timer!=0){
-                    std::thread t(&HiwinlibmodbusServiceServer::DO_Timer, this, digital_output, request->do_timer);
+                    std::thread t(&HiwinlibmodbusServiceServer::DO_Timer, this, d_o, request->do_timer);
                     t.detach(); 
                 }
                 request->holding == false;
@@ -164,6 +166,10 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
                 while(1){
                     hiwinlibmodbus.Arm_State_REGISTERS(arm_state); // return arm_state
                     // int arm_state = hiwinlibmodbus.Check_Arm_State();
+                    if (digital_output){
+                        hiwinlibmodbus.DO(digital_output, 0);
+                        digital_output = 0;
+                    }
                     if (arm_state == 1){
                         response->arm_state = arm_state;
                         break;
