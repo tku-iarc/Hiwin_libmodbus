@@ -65,13 +65,13 @@ class ThreePointsCalibration(Node):
         self.final_cali_pose = []
         self.new_base = []
 
-        self.declare_parameter("PHOTO_POSE", None)
-        self.declare_parameter("camera_intrinsics", None)
-        self.declare_parameter("camera_distortion", None)
-        self.declare_parameter("tool2cam_quaternion", None)
-        self.declare_parameter("tool2cam_trans", None)
-        self.declare_parameter("base2tool_quaternion", None)
-        self.declare_parameter("base2tool_trans", None)
+        self.declare_parameter("PHOTO_POSE", rclpy.Parameter.Type.DOUBLE_ARRAY)
+        self.declare_parameter("camera_intrinsics", rclpy.Parameter.Type.DOUBLE_ARRAY)
+        self.declare_parameter("camera_distortion", rclpy.Parameter.Type.DOUBLE_ARRAY)
+        self.declare_parameter("tool2cam_quaternion", rclpy.Parameter.Type.DOUBLE_ARRAY)
+        self.declare_parameter("tool2cam_trans", rclpy.Parameter.Type.DOUBLE_ARRAY)
+        self.declare_parameter("base2tool_quaternion", rclpy.Parameter.Type.DOUBLE_ARRAY)
+        self.declare_parameter("base2tool_trans", rclpy.Parameter.Type.DOUBLE_ARRAY)
         self.photo_pose = self.get_parameter("PHOTO_POSE").get_parameter_value().double_array_value
         self.tool2cam_quaternion = self.get_parameter("tool2cam_quaternion").get_parameter_value().double_array_value
         self.tool2cam_trans = self.get_parameter("tool2cam_trans").get_parameter_value().double_array_value
@@ -357,11 +357,11 @@ class ThreePointsCalibration(Node):
         # tool2cam_trans = np.array([[-0.03365709503264675],
         #                            [-0.02760361078502668],
         #                            [0.03654466986285128]])
-        tool2cam_trans = np.array([self.tool2cam_trans[0],
-                                   self.tool2cam_trans[1],
-                                   self.tool2cam_trans[2]])
+        tool2cam_trans = np.array([self.tool2cam_trans])
         
-        tool2cam_mat = np.append(tool2cam_rot, tool2cam_trans, axis=1)
+        print("tool2cam_trans = {}".format(tool2cam_trans))
+        
+        tool2cam_mat = np.append(tool2cam_rot, tool2cam_trans.T, axis=1)
         tool2cam_mat = np.append(tool2cam_mat, np.array([[0., 0., 0., 1.]]), axis=0)
         # transform_mat = np.linalg.inv(transform_mat)
 
@@ -381,11 +381,9 @@ class ThreePointsCalibration(Node):
         #                             [0.252052],
         #                             [0.299256]])
         
-        base2tool_trans = np.array([self.base2tool_trans[0],
-                                    self.base2tool_trans[1],
-                                    self.base2tool_trans[2]])
+        base2tool_trans = np.array([self.base2tool_trans])
         
-        base2tool_mat = np.append(base2tool_rot, base2tool_trans, axis=1)
+        base2tool_mat = np.append(base2tool_rot, base2tool_trans.T, axis=1)
         base2tool_mat = np.append(base2tool_mat, np.array([[0., 0., 0., 1.]]), axis=0)
 
 
@@ -394,11 +392,11 @@ class ThreePointsCalibration(Node):
                                                              aruco_pose.orientation.x, 
                                                              aruco_pose.orientation.y, 
                                                              aruco_pose.orientation.z))
-        cam2aruco_trans = np.array([[aruco_pose.position.x],
-                                    [aruco_pose.position.y],
-                                    [aruco_pose.position.z]])
+        cam2aruco_trans = np.array([[aruco_pose.position.x,
+                                     aruco_pose.position.y,
+                                     aruco_pose.position.z]])
         
-        cam2aruco_mat = np.append(cam2aruco_rot, cam2aruco_trans, axis=1)
+        cam2aruco_mat = np.append(cam2aruco_rot, cam2aruco_trans.T, axis=1)
         cam2aruco_mat = np.append(cam2aruco_mat, np.array([[0., 0., 0., 1.]]), axis=0)
 
         base2cam_mat = np.matmul(base2tool_mat, tool2cam_mat)
