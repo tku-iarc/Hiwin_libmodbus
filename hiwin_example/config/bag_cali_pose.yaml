@@ -7,3 +7,4 @@ three_points_calibration:
     tool2cam_trans: [-0.02760361078502668, -0.03365709503264675, 0.03654466986285128]
     base2tool_quaternion: [-180.0, 0.0, 90.0] #angle
     base2tool_trans: [-0.229737, 0.355894, 0.294339]
+    input_pin: 6

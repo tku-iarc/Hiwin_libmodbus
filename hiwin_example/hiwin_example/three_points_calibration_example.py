@@ -65,7 +65,7 @@ class ThreePointsCalibration(Node):
         self.tool2cam_trans = self.get_parameter("tool2cam_trans").get_parameter_value().double_array_value
         self.base2tool_quaternion = self.get_parameter("base2tool_quaternion").get_parameter_value().double_array_value
         self.base2tool_trans = self.get_parameter("base2tool_trans").get_parameter_value().double_array_value
-        self.base2tool_trans = self.get_parameter("input_pin").get_parameter_value().double_array_value
+        self.input_pin = self.get_parameter("input_pin").get_parameter_value().double_array_value
 
 
     def _state_machine(self, state: States) -> States:
@@ -186,7 +186,7 @@ class ThreePointsCalibration(Node):
                     while 1:
                         req = self.generate_robot_request(
                             cmd_mode=RobotCommand.Request.READ_DI,
-                            digital_input_pin=1,
+                            digital_input_pin=self.input_pin,
                             holding=False)
                         res = self.call_hiwin(req)
                         print(res.digital_state)
