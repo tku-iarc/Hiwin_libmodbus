@@ -65,7 +65,7 @@ class ThreePointsCalibration(Node):
         self.tool2cam_trans = self.get_parameter("tool2cam_trans").get_parameter_value().double_array_value
         self.base2tool_quaternion = self.get_parameter("base2tool_quaternion").get_parameter_value().double_array_value
         self.base2tool_trans = self.get_parameter("base2tool_trans").get_parameter_value().double_array_value
-        self.input_pin = self.get_parameter("input_pin").get_parameter_value().double_array_value
+        self.input_pin = self.get_parameter("input_pin").get_parameter_value().integer_value
 
 
     def _state_machine(self, state: States) -> States:
@@ -93,6 +93,7 @@ class ThreePointsCalibration(Node):
             res = self.call_hiwin(req)
             current_position = res.current_position
 
+            time.sleep(0.2)
             aruco_req = ArucoMarkerInfo.Request()
             aruco_req.process = True
             res = self.call_for_aruco(aruco_req)
@@ -141,15 +142,28 @@ class ThreePointsCalibration(Node):
                     pose=pose)
                 res = self.call_hiwin(req)
 
+                time.sleep(0.2)
                 aruco_req = ArucoMarkerInfo.Request()
                 aruco_req.process = True
-                res = self.call_for_aruco(aruco_req)
-                if len(res.poses) == 0:
-                    continue
+                marker_pose = None
+                marker_poses = []
+                for _ in range(10):
+                    res = self.call_for_aruco(aruco_req)
+                    if len(res.poses) == 0:
+                        self.get_logger().warn('FUCK NO MARKER')
+                        continue
+                    marker_pose = res.poses[0]
+                    marker_poses.append([marker_pose.position.x, 
+                                         marker_pose.position.y, 
+                                         marker_pose.position.z])
+                    time.sleep(0.05)
+
+                marker_pose.position.x, marker_pose.position.y,\
+                marker_pose.position.z = np.mean(marker_poses, axis=0)
                 req = self.generate_robot_request(
                     cmd_mode=RobotCommand.Request.CHECK_POSE)
                 res = self.call_hiwin(req)
-                p[:] = self.convert_arm_pose(res.poses[0], res.current_position)[:]
+                p[:] = self.convert_arm_pose(marker_pose, res.current_position)[:]
 
 
             print(self.cali_pose)
@@ -166,7 +180,7 @@ class ThreePointsCalibration(Node):
             res = self.call_hiwin(req)
             pose = Twist()
             print(self.cali_pose)
-            input()
+            # input()
             pose.angular.x, pose.angular.y, pose.angular.z = res.current_position[3:6]
             for p in self.cali_pose:
                 pose.linear.x, pose.linear.y, pose.linear.z = p[0:3]
@@ -176,8 +190,8 @@ class ThreePointsCalibration(Node):
                     pose=pose)
                 res = self.call_hiwin(req)
                 if res.arm_state == RobotCommand.Response.IDLE:
-                    input()
-                    pose.linear.z = p[0:3] + 50
+                    # input()
+                    pose.linear.z = p[2] + 50
                     req = self.generate_robot_request(
                         cmd_mode=RobotCommand.Request.LINE,
                         pose=pose,
@@ -230,7 +244,7 @@ class ThreePointsCalibration(Node):
                 pose=pose
             )
             res = self.call_hiwin(req)
-            nest_state = States.CLOSE_ROBOT
+            nest_state = States.FINISH
 
 
         elif state == States.CLOSE_ROBOT:
@@ -252,6 +266,7 @@ class ThreePointsCalibration(Node):
             if state == None:
                 break
         self.destroy_node()
+        rclpy.shutdown()
 
     def _wait_for_future_done(self, future: Future, timeout=-1):
         time_start = time.time()
@@ -324,7 +339,10 @@ class ThreePointsCalibration(Node):
             res = None
         return res
 
-    def convert_arm_pose(self, aruco_pose, base2tool):
+    def convert_arm_pose(self, aruco_pose, arm_pose):
+        base2tool = np.array(arm_pose)
+        base2tool[:3] /= 1000
+
         tool2cam_rot = qtn.as_rotation_matrix(np.quaternion(self.tool2cam_quaternion[3],
                                                             self.tool2cam_quaternion[0], 
                                                             self.tool2cam_quaternion[1], 
