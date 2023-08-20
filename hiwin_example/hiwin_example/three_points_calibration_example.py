@@ -21,6 +21,7 @@ from hiwin_example import transformations
 
 DEFAULT_VELOCITY = 20
 DEFAULT_ACCELERATION = 20
+MOVING_VELOCITY = 100
 
 ORIGIN_ID = 15
 
@@ -78,7 +79,7 @@ class ThreePointsCalibration(Node):
             pose = Twist()
             req = self.generate_robot_request(
                 cmd_type=RobotCommand.Request.JOINTS_CMD,
-                joints=self.photo_pose
+                joints=self.photo_pose, velocity=MOVING_VELOCITY
                 )
             res = self.call_hiwin(req)
             if res.arm_state == RobotCommand.Response.IDLE:
@@ -121,7 +122,7 @@ class ThreePointsCalibration(Node):
                     pose.angular.x += 0.5
                     req = self.generate_robot_request(
                         cmd_mode=RobotCommand.Request.PTP,
-                        pose=pose)
+                        pose=pose, velocity=MOVING_VELOCITY)
                     res = self.call_hiwin(req)
                     nest_state = States.GET_CALI_POINT
 
@@ -139,7 +140,7 @@ class ThreePointsCalibration(Node):
                 pose.linear.z += 200
                 req = self.generate_robot_request(
                     cmd_mode=RobotCommand.Request.PTP,
-                    pose=pose)
+                    pose=pose, velocity=MOVING_VELOCITY)
                 res = self.call_hiwin(req)
 
                 time.sleep(0.2)
@@ -187,7 +188,7 @@ class ThreePointsCalibration(Node):
                 pose.linear.z += 90
                 req = self.generate_robot_request(
                     cmd_mode=RobotCommand.Request.PTP,
-                    pose=pose)
+                    pose=pose, velocity=MOVING_VELOCITY)
                 res = self.call_hiwin(req)
                 if res.arm_state == RobotCommand.Response.IDLE:
                     # input()
@@ -224,7 +225,7 @@ class ThreePointsCalibration(Node):
                     req = self.generate_robot_request(
                         cmd_type=RobotCommand.Request.JOINTS_CMD,
                         joints=self.photo_pose
-                        )
+                        , velocity=MOVING_VELOCITY)
                     res = self.call_hiwin(req)
             nest_state = States.CALCULATE_COORDINATE
 
