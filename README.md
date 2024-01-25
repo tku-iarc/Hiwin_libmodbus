@@ -27,6 +27,10 @@ git clone https://github.com/errrr0501/ros2_aruco.git
 
 git clone https://github.com/IntelRealSense/realsense-ros.git
 
+sudo apt update -qq
+rosdep update
+rosdep install --from-paths src --ignore-src -y
+
 # build the workspace
 cd ~<your_workspace>
 colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
