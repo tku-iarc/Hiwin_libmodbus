@@ -16,6 +16,7 @@ uint8 READ_DI=12
 uint8 SET_BASE=13
 uint8 SET_TOOL=14
 uint8 MOTION_STOP=15
+uint8 FLANGE_MOVE=16
 
 
 # cmd type
@@ -52,6 +53,10 @@ float64[] circ_end
 # for JOG mode
 int8 jog_joint
 int8 jog_dir
+
+# for FLANGE_MOVE mode
+string move_dir
+int8 move_dis
 
 ---
 

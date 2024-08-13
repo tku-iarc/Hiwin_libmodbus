@@ -8,7 +8,9 @@
   <license>BSD-2.0</license>
 
   <buildtool_depend>ament_cmake_ros</buildtool_depend>
+
   <depend>hiwin_interfaces</depend>
+  <!-- <depend>tf2_geometry_msgs</depend> -->
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 

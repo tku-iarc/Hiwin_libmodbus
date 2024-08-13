@@ -65,6 +65,8 @@ public:
   HIWIN_LIBMODBUS_PUBLIC_TYPE
   void getArmPose(std::vector<double> &Pose);
   HIWIN_LIBMODBUS_PUBLIC_TYPE
+  void moveFlange(std::vector<double> &Pose, std::string& move_dir, const double move_dis);
+  HIWIN_LIBMODBUS_PUBLIC_TYPE
   void PTP(
     uint16_t type, uint16_t vel, uint16_t acc, uint16_t TOOL, uint16_t BASE, const std::vector<double> GOAL);
   HIWIN_LIBMODBUS_PUBLIC_TYPE

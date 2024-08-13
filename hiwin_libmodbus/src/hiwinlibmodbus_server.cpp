@@ -161,6 +161,17 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
                 hiwinlibmodbus.Motion_Stop();
                 request->holding == false;
             }
+            else if (request->cmd_mode == 16){
+                if (request->move_dir != "x" && request->move_dir != "y" && request->move_dir != "z") {
+                    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "error command");
+                }
+                else{
+                    const int move_distance = request->move_dis;
+                    hiwinlibmodbus.moveFlange(current_pos, request->move_dir, move_distance);
+                    request->holding == true;
+                }
+                
+            }
             if (request->holding == true){
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
                 while(1){

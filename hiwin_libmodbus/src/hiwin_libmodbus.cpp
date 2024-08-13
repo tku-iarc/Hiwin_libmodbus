@@ -1,5 +1,7 @@
 #include <iostream>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include "hiwin_libmodbus/hiwin_libmodbus.hpp"
+
 
 // namespace hiwin_libmodbus
 // {
@@ -264,6 +266,43 @@ void HiwinLibmodbus::getArmPose(std::vector<double> &Pose){
     Pose.push_back(rz);
 
 }
+
+
+void HiwinLibmodbus::moveFlange(std::vector<double> &Pose, std::string& move_dir, const double move_dis){
+    std::vector<double> current_pos;
+    Pose.clear();
+    HiwinLibmodbus::getArmPose(current_pos);
+
+    tf2::Quaternion orientation;
+    tf2::Vector3 translation_in_tool_frame(0.0, 0.0, 0.0);
+    orientation.setRPY(current_pos[3], current_pos[4], current_pos[5]);  // Roll (rx), Pitch (ry), Yaw (rz)
+    
+    if (move_dir == "x") {
+        translation_in_tool_frame.setX(move_dis); // Move x forward
+    } 
+    else if (move_dir == "y") {
+        translation_in_tool_frame.setY(move_dis); // Move y forward
+    } 
+    else{
+        translation_in_tool_frame.setZ(move_dis);// Move z forward
+    } 
+        
+    tf2::Vector3 translation_in_world_frame = tf2::quatRotate(orientation, translation_in_tool_frame);
+
+    current_pos[0] += translation_in_world_frame.x();
+    current_pos[1] += translation_in_world_frame.y();
+    current_pos[2] += translation_in_world_frame.z();
+
+    Pose.push_back(current_pos[0]);
+    Pose.push_back(current_pos[1]);
+    Pose.push_back(current_pos[2]);
+    Pose.push_back(current_pos[3]);
+    Pose.push_back(current_pos[4]);
+    Pose.push_back(current_pos[5]);
+
+
+}
+
 
 void HiwinLibmodbus::PTP(uint16_t type, uint16_t vel, uint16_t acc, uint16_t TOOL, uint16_t BASE, const std::vector<double> GOAL){
   const double* goal = &GOAL[0];

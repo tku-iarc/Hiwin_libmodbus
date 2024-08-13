@@ -67,6 +67,9 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(hiwin_interfaces REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
 
 
 # uncomment the following section in order to fill in
@@ -83,6 +86,7 @@ set(LIBMODBUS_CORE_FILES
 add_library(${PROJECT_NAME} SHARED
   src/hiwin_libmodbus.cpp
   ${LIBMODBUS_CORE_FILES}
+  ${tf2_geometry_msgs_INCLUDE_DIRS}
 )
 
 target_compile_features(${PROJECT_NAME} 
@@ -92,6 +96,13 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${LIBMODBUS_PATH}/src>
   $<BUILD_INTERFACE:${LIBMODBUS_PATH}>
   $<INSTALL_INTERFACE:include>)
+
+# Link tf2 and tf2_geometry_msgs libraries
+target_link_libraries(${PROJECT_NAME}
+  tf2::tf2
+  tf2_geometry_msgs::tf2_geometry_msgs
+)
+
 
 add_library(${PROJECT_NAME}_ctype_wrapper SHARED
   src/hiwin_libmodbus_ctype_wrapper.cpp)
