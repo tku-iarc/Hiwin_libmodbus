@@ -167,7 +167,8 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
                 }
                 else{
                     const int move_distance = request->move_dis;
-                    hiwinlibmodbus.moveFlange(current_pos, request->move_dir, move_distance);
+                    hiwinlibmodbus.moveFlange(current_pos, request->move_dir, move_distance); 
+                    hiwinlibmodbus.LIN(request->cmd_type, request->velocity, request->acceleration, request->tool, request->base, command);
                     request->holding == true;
                 }
                 
