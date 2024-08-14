@@ -161,6 +161,7 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
                 hiwinlibmodbus.Motion_Stop();
                 request->holding == false;
             }
+
             else if (request->cmd_mode == 16){
                 if (request->move_dir != "x" && request->move_dir != "y" && request->move_dir != "z") {
                     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "error command");
@@ -168,7 +169,17 @@ class HiwinlibmodbusServiceServer : public rclcpp::Node
                 else{
                     const int move_distance = request->move_dis;
                     hiwinlibmodbus.moveFlange(current_pos, request->move_dir, move_distance); 
-                    hiwinlibmodbus.LIN(request->cmd_type, request->velocity, request->acceleration, request->tool, request->base, command);
+                    response->current_position = current_pos;
+                    // command = {current_pos[0], current_pos[1], current_pos[2],  
+                    //             current_pos[3], current_pos[4], current_pos[5]};
+                    // std::cout<<current_pos[0]<<std::endl;
+                    // std::cout<<current_pos[1]<<std::endl;
+                    // std::cout<<current_pos[2]<<std::endl;
+                    // std::cout<<current_pos[3]<<std::endl;
+                    // std::cout<<current_pos[4]<<std::endl;
+                    // std::cout<<current_pos[5]<<std::endl;
+                    hiwinlibmodbus.LIN(request->cmd_type, request->velocity, request->acceleration, request->tool, request->base, current_pos);
+                    std::cout<<"?HELLOHELLOHELLO"<<std::endl;
                     request->holding == true;
                 }
                 

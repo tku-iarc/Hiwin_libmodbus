@@ -56,7 +56,7 @@ int8 jog_dir
 
 # for FLANGE_MOVE mode
 string move_dir
-int8 move_dis
+float64 move_dis
 
 ---
 

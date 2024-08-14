@@ -29,6 +29,7 @@ NUM_OBJECTS = 5
 class States(Enum):
     INIT = 0
     FINISH = 1
+    FLANGE_MOVE = 2
     MOVE_TO_PHOTO_POSE = 2
     YOLO_DETECT = 3
     MOVE_TO_OPJECT_TOP = 4
@@ -48,105 +49,126 @@ class ExampleStrategy(Node):
     def _state_machine(self, state: States) -> States:
         if state == States.INIT:
             self.get_logger().info('INIT')
-            nest_state = States.MOVE_TO_PHOTO_POSE
+            nest_state = States.FLANGE_MOVE
 
-        elif state == States.MOVE_TO_PHOTO_POSE:
-            self.get_logger().info('MOVE_TO_PHOTO_POSE')
-            pose = Twist()
+    # def _state_machine(self, state: States) -> States:
+    #     if state == States.INIT:
+    #         self.get_logger().info('INIT')
+    #         nest_state = States.MOVE_TO_PHOTO_POSE
+
+    #     elif state == States.MOVE_TO_PHOTO_POSE:
+    #         self.get_logger().info('MOVE_TO_PHOTO_POSE')
+    #         pose = Twist()
+    #         req = self.generate_robot_request(
+    #             cmd_type=RobotCommand.Request.JOINTS_CMD,
+    #             joints=PHOTO_POSE
+    #             )
+    #         res = self.call_hiwin(req)
+    #         if res.arm_state == RobotCommand.Response.IDLE:
+    #             nest_state = States.YOLO_DETECT
+    #         else:
+    #             nest_state = None
+
+    #     elif state == States.YOLO_DETECT:
+    #         self.get_logger().info('YOLO_DETECT')
+    #         res = self.call_yolo()
+    #         # OBJECT_POSE here for example, should get obj pose according to yolo result
+    #         if res.has_object:
+    #             self.object_pose = res.object_pose
+    #             nest_state = States.MOVE_TO_OPJECT_TOP
+    #         else:
+    #             nest_state = States.CHECK_POSE
+    #             # nest_state = States.CLOSE_ROBOT
+
+    #     elif state == States.MOVE_TO_OPJECT_TOP:
+    #         self.get_logger().info('MOVE_TO_OPJECT_TOP')
+    #         pose = Twist()
+    #         [pose.linear.x, pose.linear.y, pose.linear.z] = self.object_pose[0:3]
+    #         [pose.angular.x, pose.angular.y, pose.angular.z] = self.object_pose[3:6]
+    #         # pose.linear.z += 10
+    #         req = self.generate_robot_request(
+    #             cmd_mode=RobotCommand.Request.PTP,
+    #             pose=pose)
+    #         res = self.call_hiwin(req)
+    #         if res.arm_state == RobotCommand.Response.IDLE:
+    #             nest_state = States.PICK_OBJECT
+    #         else:
+    #             nest_state = None
+
+    #     elif state == States.PICK_OBJECT:
+    #         self.get_logger().info('PICK_OBJECT')
+    #         pose = Twist()
+    #         [pose.linear.x, pose.linear.y, pose.linear.z] = self.object_pose[0:3]
+    #         [pose.angular.x, pose.angular.y, pose.angular.z] = self.object_pose[3:6]
+    #         req = self.generate_robot_request(
+    #             cmd_mode=RobotCommand.Request.LINE,
+    #             holding=False,
+    #             velocity=5,
+    #             pose=pose
+    #         )
+    #         res = self.call_hiwin(req)
+            
+    #         print(res)
+    #         req = self.generate_robot_request(
+    #             cmd_mode=RobotCommand.Request.DIGITAL_OUTPUT,
+    #             digital_output_cmd=RobotCommand.Request.DIGITAL_ON,
+    #             digital_output_pin=VACUUM_PIN,
+    #             holding=False,
+    #             pose=pose
+    #         )
+    #         res = self.call_hiwin(req)
+
+    #         pose.linear.z -= 30
+    #         req = self.generate_robot_request(
+    #             cmd_mode=RobotCommand.Request.LINE,
+    #             pose=pose
+    #         )
+    #         res = self.call_hiwin(req)
+            
+    #         if res.arm_state == RobotCommand.Response.IDLE:
+    #             nest_state = States.MOVE_TO_PLACE_POSE
+    #         else:
+    #             nest_state = None
+
+    #     elif state == States.MOVE_TO_PLACE_POSE:
+    #         self.get_logger().info('MOVE_TO_PLACE_POSE')
+    #         pose = Twist()
+    #         req = self.generate_robot_request(
+    #             cmd_type=RobotCommand.Request.JOINTS_CMD,
+    #             joints=PLACE_POSE,
+    #             pose=pose)
+    #         res = self.call_hiwin(req)
+
+    #         req = self.generate_robot_request(
+    #             cmd_mode=RobotCommand.Request.DIGITAL_OUTPUT,
+    #             digital_output_cmd=RobotCommand.Request.DIGITAL_OFF,
+    #             digital_output_pin=VACUUM_PIN,
+    #             holding=True,
+    #             pose=pose
+    #         )
+    #         res = self.call_hiwin(req)
+    #         req = self.generate_robot_request(
+    #             cmd_mode=RobotCommand.Request.WAITING
+    #         )
+    #         res = self.call_hiwin(req)
+    #         if res.arm_state == RobotCommand.Response.IDLE:
+    #             nest_state = States.MOVE_TO_PHOTO_POSE
+    #         else:
+    #             nest_state = None
+
+        elif state == States.FLANGE_MOVE:
+            self.get_logger().info('FLANGE_MOVE')
             req = self.generate_robot_request(
-                cmd_type=RobotCommand.Request.JOINTS_CMD,
-                joints=PHOTO_POSE
-                )
+                cmd_mode=RobotCommand.Request.FLANGE_MOVE,
+                velocity = 30,
+                acceleration = 30,
+                move_dis=100.0)
             res = self.call_hiwin(req)
+            print(res.current_position)
+  
             if res.arm_state == RobotCommand.Response.IDLE:
-                nest_state = States.YOLO_DETECT
-            else:
-                nest_state = None
-
-        elif state == States.YOLO_DETECT:
-            self.get_logger().info('YOLO_DETECT')
-            res = self.call_yolo()
-            # OBJECT_POSE here for example, should get obj pose according to yolo result
-            if res.has_object:
-                self.object_pose = res.object_pose
-                nest_state = States.MOVE_TO_OPJECT_TOP
-            else:
                 nest_state = States.CHECK_POSE
-                # nest_state = States.CLOSE_ROBOT
-
-        elif state == States.MOVE_TO_OPJECT_TOP:
-            self.get_logger().info('MOVE_TO_OPJECT_TOP')
-            pose = Twist()
-            [pose.linear.x, pose.linear.y, pose.linear.z] = self.object_pose[0:3]
-            [pose.angular.x, pose.angular.y, pose.angular.z] = self.object_pose[3:6]
-            # pose.linear.z += 10
-            req = self.generate_robot_request(
-                cmd_mode=RobotCommand.Request.PTP,
-                pose=pose)
-            res = self.call_hiwin(req)
-            if res.arm_state == RobotCommand.Response.IDLE:
-                nest_state = States.PICK_OBJECT
-            else:
                 nest_state = None
-
-        elif state == States.PICK_OBJECT:
-            self.get_logger().info('PICK_OBJECT')
-            pose = Twist()
-            [pose.linear.x, pose.linear.y, pose.linear.z] = self.object_pose[0:3]
-            [pose.angular.x, pose.angular.y, pose.angular.z] = self.object_pose[3:6]
-            req = self.generate_robot_request(
-                cmd_mode=RobotCommand.Request.LINE,
-                holding=False,
-                velocity=5,
-                pose=pose
-            )
-            res = self.call_hiwin(req)
-            
-            print(res)
-            req = self.generate_robot_request(
-                cmd_mode=RobotCommand.Request.DIGITAL_OUTPUT,
-                digital_output_cmd=RobotCommand.Request.DIGITAL_ON,
-                digital_output_pin=VACUUM_PIN,
-                holding=False,
-                pose=pose
-            )
-            res = self.call_hiwin(req)
-
-            pose.linear.z -= 30
-            req = self.generate_robot_request(
-                cmd_mode=RobotCommand.Request.LINE,
-                pose=pose
-            )
-            res = self.call_hiwin(req)
-            
-            if res.arm_state == RobotCommand.Response.IDLE:
-                nest_state = States.MOVE_TO_PLACE_POSE
-            else:
-                nest_state = None
-
-        elif state == States.MOVE_TO_PLACE_POSE:
-            self.get_logger().info('MOVE_TO_PLACE_POSE')
-            pose = Twist()
-            req = self.generate_robot_request(
-                cmd_type=RobotCommand.Request.JOINTS_CMD,
-                joints=PLACE_POSE,
-                pose=pose)
-            res = self.call_hiwin(req)
-
-            req = self.generate_robot_request(
-                cmd_mode=RobotCommand.Request.DIGITAL_OUTPUT,
-                digital_output_cmd=RobotCommand.Request.DIGITAL_OFF,
-                digital_output_pin=VACUUM_PIN,
-                holding=True,
-                pose=pose
-            )
-            res = self.call_hiwin(req)
-            req = self.generate_robot_request(
-                cmd_mode=RobotCommand.Request.WAITING
-            )
-            res = self.call_hiwin(req)
-            if res.arm_state == RobotCommand.Response.IDLE:
-                nest_state = States.MOVE_TO_PHOTO_POSE
             else:
                 nest_state = None
 
@@ -207,7 +229,9 @@ class ExampleStrategy(Node):
             circ_s=[],
             circ_end=[],
             jog_joint=6,
-            jog_dir=0
+            jog_dir=0,
+            move_dir = "z",
+            move_dis = 0.01
             ):
         request = RobotCommand.Request()
         request.digital_input_pin = digital_input_pin
@@ -226,6 +250,8 @@ class ExampleStrategy(Node):
         request.joints = joints
         request.circ_s = circ_s
         request.pose = pose
+        request.move_dir = move_dir
+        request.move_dis = move_dis
         return request
 
     def call_hiwin(self, req):

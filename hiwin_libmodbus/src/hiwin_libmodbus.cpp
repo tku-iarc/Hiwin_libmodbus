@@ -269,6 +269,7 @@ void HiwinLibmodbus::getArmPose(std::vector<double> &Pose){
 
 
 void HiwinLibmodbus::moveFlange(std::vector<double> &Pose, std::string& move_dir, const double move_dis){
+
     std::vector<double> current_pos;
     Pose.clear();
     HiwinLibmodbus::getArmPose(current_pos);
@@ -286,7 +287,11 @@ void HiwinLibmodbus::moveFlange(std::vector<double> &Pose, std::string& move_dir
     else{
         translation_in_tool_frame.setZ(move_dis);// Move z forward
     } 
-        
+    
+    std::cout<<translation_in_tool_frame[0]<<std::endl;
+    std::cout<<translation_in_tool_frame[1]<<std::endl;
+    std::cout<<translation_in_tool_frame[2]<<std::endl;
+
     tf2::Vector3 translation_in_world_frame = tf2::quatRotate(orientation, translation_in_tool_frame);
 
     current_pos[0] += translation_in_world_frame.x();
